@@ -44,7 +44,7 @@ if not db_results:
                 product_desc = element.find("div").text
             count += 1
 
-        # Only insert products with a description and price
+        # Only insert products
         if price and product_desc:
             cursor = db.cursor()
             insert_info = (search, price, product_desc)
