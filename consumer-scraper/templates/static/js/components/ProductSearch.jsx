@@ -8,12 +8,20 @@ class ProductSearch extends Component {
   constructor(props) {
     // Initialize mutable state
     super(props);
-    this.state = { products: [] };
-    this.componentDidMount = this.componentDidMount.bind(this);
+    this.state = { products: [], search: "" };
+    this.handleSearch = this.handleSearch.bind(this);
+    this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
-  componentDidMount() {
-    fetch("/api/search?q=rolex", { credentials: 'same-origin' })
+  handleSearchChange(e){
+    this.setState({
+      search: e.target.value,
+    });
+  }
+
+  handleSearch(){
+    const url = "api/search?q=" + this.state.search;
+    fetch(url, { credentials: 'same-origin' })
       .then((response) => {
         if (!response.ok) throw Error(response.statusText);
         return response.json();
@@ -25,13 +33,17 @@ class ProductSearch extends Component {
 
 
       })
-      .catch(error => console.log(error)); // eslint-disable-line no-console
+      .catch(error => console.log(error));
   }
 
   render() {
     // Render each posts
     return (
-      <div>
+      <div style={{textAlign:'center'}}>
+        <form>
+          <input class="search" type="text" placeholder="What are you shopping for?" onChange={this.handleSearchChange}/>
+          <input type="submit" class="search-submit" onClick={this.handleSearch} />
+        </form>
         {this.state.products.map(product => (
           <Product price={product.price} productDesc={product.product_desc} />
         ))}

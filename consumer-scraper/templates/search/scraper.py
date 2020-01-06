@@ -25,12 +25,12 @@ def scrape_search_results(search, db):
                 product_desc = element.find("div").text
             count += 1
 
-        # Only insert products that have both price and description
-        if price and product_desc:
-            cursor = db.cursor()
-            insert_info = (search, price, product_desc)
-            # Add the product info to the database
-            cursor.execute("INSERT INTO results (search, price, product) VALUES(%s, %s, %s)", insert_info)
-            db.commit()
-            results.append((product_desc, price))
-        return results
+            # Only insert products that have both price and description
+            if price and product_desc:
+                cursor = db.cursor()
+                insert_info = (search, price, product_desc)
+                # Add the product info to the database
+                cursor.execute("INSERT INTO results (search, price, product) VALUES(%s, %s, %s)", insert_info)
+                db.commit()
+                results.append((product_desc, price))
+    return results
