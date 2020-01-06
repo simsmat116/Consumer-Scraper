@@ -13,6 +13,14 @@ def get_db():
     )
     return db
 
+@app.route('/')
+def home_page():
+    return render_template('index.html')
+
+@app.route('/search')
+def search_page():
+    return render_template('index.html')
+
 @app.route('/api/search', methods=['GET'])
 def get_search_results():
     search = request.args.get('q')
@@ -22,11 +30,15 @@ def get_search_results():
     cursor.execute("SELECT product, price FROM results WHERE search = (%s)", (search,))
     row_headers=[x[0] for x in cursor.description]
     results = cursor.fetchall()
+    # If no results in the database, scrape Google Shopping
     if not results:
         results = scraper.scrape_search_results(search, db)
 
-    json_data = []
+    context = { "results": [] }
     for result in results:
-        json_data.append(dict(zip(row_headers,result)))
+        context["results"].append({
+            "product_desc": result[0],
+            "price": result[1]
+        })
 
-    return jsonify(json_data)
+    return jsonify(**context)
