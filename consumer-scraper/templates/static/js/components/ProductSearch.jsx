@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import Product from './Product'
+
 
 class ProductSearch extends Component {
 
@@ -30,12 +32,8 @@ class ProductSearch extends Component {
     // Render each posts
     return (
       <div>
-        <p> RESULTS </p>
         {this.state.products.map(product => (
-          <div>
-            <div>{product.price}</div>
-            <div>{product.product_desc}</div>
-          </div>
+          <Product price={product.price} productDesc={product.product_desc} />
         ))}
       </div>
     );

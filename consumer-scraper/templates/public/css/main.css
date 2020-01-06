@@ -1,0 +1,27 @@
+.product {
+  box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  height: 175px;
+  text-align: center;
+  padding-top: 20px;
+  font-family: arial;
+  border-radius: 25px;
+  margin-top: 30px;
+  margin: 30px auto;
+}
+
+.productLink {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+.productLink:hover{
+  background-color: #013220;
+}
