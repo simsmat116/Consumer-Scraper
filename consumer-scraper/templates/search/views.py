@@ -24,10 +24,13 @@ def search_page():
 @app.route('/api/search', methods=['GET'])
 def get_search_results():
     search = request.args.get('q')
+    page = request.args.get('p')
+    offset = (int(page) - 1) * 10
     db = get_db()
     cursor = db.cursor()
     # Query the database to see if there are existing records
-    cursor.execute("SELECT product, price FROM results WHERE search = (%s)", (search,))
+    cursor.execute("""SELECT product, price FROM results WHERE search = (%s) ORDER BY price
+                      LIMIT 10 OFFSET %s""", (search, offset))
     row_headers=[x[0] for x in cursor.description]
     results = cursor.fetchall()
     # If no results in the database, scrape Google Shopping

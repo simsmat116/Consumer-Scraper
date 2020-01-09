@@ -8,7 +8,7 @@ class ProductSearch extends Component {
   constructor(props) {
     // Initialize mutable state
     super(props);
-    this.state = { products: [], search: "" };
+    this.state = { products: [], search: "", page: 1 };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
   }
@@ -20,7 +20,8 @@ class ProductSearch extends Component {
   }
 
   handleSearch(){
-    const url = "api/search?q=" + this.state.search;
+    const url = "api/search?q=" + this.state.search + "&p=" + String(this.state.page);
+    console.log(url);
     fetch(url, { credentials: 'same-origin' })
       .then((response) => {
         if (!response.ok) throw Error(response.statusText);

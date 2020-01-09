@@ -19,6 +19,9 @@ def scrape_search_results(search, db):
             if count == 1:
                 # Get the price and exclude first character ($)
                 price = element.find("div").text[1:]
+                # Sometimes spaces are followed by text, need to remove to convert to float
+                if price.find(" ") > 0:
+                    price = price[:price.find(" ")]
                 # Need to remove comma before converting to float
                 price = float(price.replace(",", ""))
             elif count == 2:
@@ -33,4 +36,6 @@ def scrape_search_results(search, db):
                 cursor.execute("INSERT INTO results (search, price, product) VALUES(%s, %s, %s)", insert_info)
                 db.commit()
                 results.append((product_desc, price))
-    return results
+    results.sort(key=lambda tup: tup[1])
+    print(results)
+    return results[:10]
