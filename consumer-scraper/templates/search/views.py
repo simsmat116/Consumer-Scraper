@@ -2,6 +2,7 @@ from templates import app
 from flask import render_template, request, jsonify
 from templates.search import scraper
 import mysql.connector
+import math
 
 def get_db():
     # Establish connection to consumer_scraper database
@@ -29,7 +30,7 @@ def get_search_results():
     db = get_db()
     cursor = db.cursor()
     # Query the database to see if there are existing records
-    cursor.execute("""SELECT product, price FROM results WHERE search = (%s) ORDER BY price
+    cursor.execute("""SELECT product, price FROM results WHERE search = %s ORDER BY price
                       LIMIT 10 OFFSET %s""", (search, offset))
     row_headers=[x[0] for x in cursor.description]
     results = cursor.fetchall()
@@ -43,5 +44,10 @@ def get_search_results():
             "product_desc": result[0],
             "price": result[1]
         })
+
+    cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))
+    num_records = cursor.fetchone()[0]
+
+    context["num_pages"] = math.ceil(int(num_records) / 10)
 
     return jsonify(**context)

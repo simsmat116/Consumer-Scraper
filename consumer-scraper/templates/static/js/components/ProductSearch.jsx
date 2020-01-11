@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Product from './Product'
+import PageNav from './PageNav'
 
 
 class ProductSearch extends Component {
@@ -48,6 +49,7 @@ class ProductSearch extends Component {
         {this.state.products.map(product => (
           <Product price={product.price} productDesc={product.product_desc} />
         ))}
+        <PageNav />
       </div>
     );
   }

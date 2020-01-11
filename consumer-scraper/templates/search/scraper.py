@@ -37,5 +37,5 @@ def scrape_search_results(search, db):
                 db.commit()
                 results.append((product_desc, price))
     results.sort(key=lambda tup: tup[1])
-    print(results)
+
     return results[:10]
