@@ -46,7 +46,7 @@
 
 .page-bar{
   margin: 30px auto;
-  width: 200px;
+  width: 300px;
 }
 
 .page{
@@ -58,6 +58,16 @@
   background-color: green;
   font-family: arial;
   color: white;
+  margin: 30px auto 0px 10px;
+  float: left;
+}
+
+.page-dots {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  font-family: arial;
   margin: 30px auto;
   float: left;
 }
