@@ -30,9 +30,8 @@ def get_search_results():
     db = get_db()
     cursor = db.cursor()
     # Query the database to see if there are existing records
-    cursor.execute("""SELECT product_name, price FROM results WHERE search = %s ORDER BY price
+    cursor.execute("""SELECT * FROM results WHERE search = %s ORDER BY price
                       LIMIT 10 OFFSET %s""", (search, offset))
-    row_headers=[x[0] for x in cursor.description]
     results = cursor.fetchall()
     # If no results in the database, scrape Google Shopping
     if not results:
@@ -41,8 +40,11 @@ def get_search_results():
     context = { "results": [] }
     for result in results:
         context["results"].append({
-            "product_desc": result[0],
-            "price": result[1]
+            "product_name": result[3],
+            "product_desc": result[2],
+            "price": result[1],
+            "image_link": result[4],
+            "product_link": result[5]
         })
 
     cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))

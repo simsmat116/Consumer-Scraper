@@ -49,7 +49,7 @@ def scrape_search_results(search, db):
 
             count += 1
 
-            print(product_desc, product_name, price, image, link)
+            print(image, link)
 
             foundAll = product_desc and product_name and price and image and link
 
@@ -61,7 +61,8 @@ def scrape_search_results(search, db):
                                   product_description, image_link, product_link)
                                   VALUES(%s, %s, %s, %s, %s, %s)""", insert_info)
                 db.commit()
-                results.append((product_desc, price))
+                results.append(insert_info)
+
 
     results.sort(key=lambda tup: tup[1])
 
