@@ -57,9 +57,8 @@ def scrape_search_results(search, db):
                 cursor.execute("""INSERT INTO results (search, price, product_name,
                                   product_description, image_link, product_link)
                                   VALUES(%s, %s, %s, %s, %s, %s)""", insert_info)
-            db.commit()
-            results.append(insert_info)
-
+                db.commit()
+                results.append(insert_info)
 
     results.sort(key=lambda tup: tup[1])
 
