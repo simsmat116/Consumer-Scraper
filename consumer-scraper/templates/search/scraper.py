@@ -49,19 +49,16 @@ def scrape_search_results(search, db):
 
             count += 1
 
-            print(image, link)
 
-            foundAll = product_desc and product_name and price and image and link
-
-            if foundAll:
-                cursor = db.cursor()
-                insert_info = (search, price, product_name, product_desc, image, link)
-                # Add the product info to the database
+            cursor = db.cursor()
+            insert_info = (search, price, product_name, product_desc, image, link)
+            # Add the product info to the database if all fields populated
+            if all(insert_info):
                 cursor.execute("""INSERT INTO results (search, price, product_name,
                                   product_description, image_link, product_link)
                                   VALUES(%s, %s, %s, %s, %s, %s)""", insert_info)
-                db.commit()
-                results.append(insert_info)
+            db.commit()
+            results.append(insert_info)
 
 
     results.sort(key=lambda tup: tup[1])

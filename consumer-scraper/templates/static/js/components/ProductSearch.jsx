@@ -32,7 +32,7 @@ class ProductSearch extends Component {
       .then((context) => {
           this.setState({
             products: context.results,
-            numPages: context.num_pages
+            numPages: context.num_pages,
           });
       })
       .catch(error => console.log(error));
@@ -71,7 +71,13 @@ class ProductSearch extends Component {
           <input type="submit" class="search-submit" onClick={this.handleSearch} />
         </form>
         {this.state.products.map(product => (
-          <Product price={product.price} productDesc={product.product_desc} />
+          <Product
+           productDesc={product.product_desc}
+           productName={product.product_name}
+           productLink={product.product_link}
+           price={product.price}
+           imageLink={product.image_link}
+          />
         ))}
         <PageNav onClicked={this.pageClick} numPages={this.state.numPages} currPage={this.state.page} />
       </div>
