@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Product from './Product'
 import PageNav from './PageNav'
+import NavBar from './NavBar'
 
 
 class ProductSearch extends Component {
@@ -33,6 +34,7 @@ class ProductSearch extends Component {
           this.setState({
             products: context.results,
             numPages: context.num_pages,
+            page: 1
           });
       })
       .catch(error => console.log(error));
@@ -65,21 +67,24 @@ class ProductSearch extends Component {
   render() {
     // Render each posts
     return (
-      <div style={{textAlign:'center'}}>
-        <form>
-          <input class="search" type="text" placeholder="What are you shopping for?" onChange={this.handleSearchChange}/>
-          <input type="submit" class="search-submit" onClick={this.handleSearch} />
-        </form>
-        {this.state.products.map(product => (
-          <Product
-           productDesc={product.product_desc}
-           productName={product.product_name}
-           productLink={product.product_link}
-           price={product.price}
-           imageLink={product.image_link}
-          />
-        ))}
-        <PageNav onClicked={this.pageClick} numPages={this.state.numPages} currPage={this.state.page} />
+      <div>
+        <NavBar />
+        <div style={{textAlign:'center'}}>
+          <form>
+            <input class="search" type="text" placeholder="What are you shopping for?" onChange={this.handleSearchChange}/>
+            <input type="submit" class="searchSubmit" onClick={this.handleSearch} />
+            </form>
+            {this.state.products.map(product => (
+              <Product
+              productDesc={product.product_desc}
+              productName={product.product_name}
+              productLink={product.product_link}
+              price={product.price}
+              imageLink={product.image_link}
+              />
+            ))}
+            <PageNav onClicked={this.pageClick} numPages={this.state.numPages} currPage={this.state.page} />
+        </div>
       </div>
     );
   }

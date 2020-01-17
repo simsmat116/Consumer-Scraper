@@ -1,3 +1,24 @@
+.navbar {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+a#navbarPage {
+  float: left;
+  color: white;
+  font-family: arial;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+a#navbarPage:hover {
+  background-color: #111;
+}
+
 .search {
   margin: 15px 0;
   height: 30px;
@@ -5,7 +26,7 @@
   font-size: 16px;
 }
 
-.search-submit {
+.searchSubmit {
   background-color: #4CAF50; /* Green */
   color: white;
   padding: 0px 32px;
@@ -41,6 +62,10 @@
   border-radius: 10px;
 }
 
+.productImage {
+  height: 150px;
+}
+
 .productLink:hover{
   background-color: #013220;
 }
@@ -63,7 +88,7 @@
   display:inline-block;
 }
 
-.page-dots {
+.pageDots {
   width: 40px;
   height: 40px;
   line-height: 40px;

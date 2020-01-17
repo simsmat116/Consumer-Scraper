@@ -10,7 +10,7 @@ class PageNav extends Component {
     // If the first page isn't displayed, give user a button to click to go back
     if(currPage != 1){
       pages.push(<button class="page" onClick={this.props.onClicked}>1</button>);
-      pages.push(<div class="page-dots">...</div>);
+      pages.push(<div class="pageDots">...</div>);
     }
 
     // Add buttons for the next five pages
@@ -20,7 +20,7 @@ class PageNav extends Component {
 
     // If the last page isn't displayed, give user a button to click to go to end
     if(numPages - currPage > 4){
-      pages.push(<div class="page-dots">...</div>);
+      pages.push(<div class="pageDots">...</div>);
       pages.push(<button class="page" onClick={this.props.onClicked}>numPages</button>);
     }
 
