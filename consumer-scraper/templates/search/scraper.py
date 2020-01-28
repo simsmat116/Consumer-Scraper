@@ -1,64 +1,63 @@
 from bs4 import BeautifulSoup
 import requests
+import uuid
+from nltk.corpus import stopwords
 
-def getProductLink(google_link):
-    # When the google_link contains "http.." then it's already the product link
-    if "http" == google_link[0:4]:
-        return google_link
-    # Have to add beginning of the url in case of google_link being "/shopping/prod.."
-    url = "https://www.google.com" + google_link
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
-    # The link is contained in the "Visit site" link
-    elem = soup.find("a", string="Visit Site", href=True)
-    if not elem:
-        return ""
+def formatProductName(product_name):
+    # Remove the ... from end of string if it exists
+    product_name = product_name.replace('.', '')
+    # Remove stop words such as 'and' from the string
+    filtered_words = [word for word in product_name.split(' ') if word not in stopwords.words('english')]
+    return ' '.join(filtered_words)
 
-    return elem["href"]
+def formatPrice(price):
+    # Remove the $ and end period
+    price = price[1:-1].replace(",", "")
+    # Return the price as a float
+    return float(price)
 
 def scrape_search_results(search, db):
     # Url for Google Shopping
     url = "https://www.google.com/search?psb=1&tbm=shop&q=" + search
 
+    # Header to make it seem like it is being sent from Chrome browser
+    headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.3"}
     # Send request to get results
-    response = requests.get(url)
+    response = requests.get(url, headers=headers)
 
     soup = BeautifulSoup(response.text, "html.parser")
-
     results = []
     # Loop through the results to get price and product description
-    for product in soup.findAll("div", attrs={"class": "pslires"}):
-        count = 0
-        product_desc, product_name, price, image, link = "", "", "", "", ""
-        for element in product:
-            if count == 0:
-                image = element.find("a").find("img", src=True)["src"]
-            elif count == 1:
-                # Get the price and exclude first character ($)
-                price = element.find("div").text[1:]
-                # Sometimes spaces are followed by text, need to remove to convert to float
-                if price.find(" ") > 0:
-                    price = price[:price.find(" ")]
-                    # Need to remove comma before converting to float
-                price = float(price.replace(",", ""))
-            elif count == 2:
-                link = element.find("a", href=True)
-                product_name = link.text
-                link = getProductLink(link["href"])
-                product_desc = element.find("div").text
+    for product in soup.findAll("div", attrs={"class": "uMfazd EpWqse"}):
+        # Get the product name / description and formatting it
+        product_name = product.find("h4", attrs={"class": "A2sOrd"}).getText()
+        formatted_name = formatProductName(product_name)
 
-            count += 1
+        # Get the product link
+        product_elem = product.find("a", attrs={"class": "sHaywe VQN8fd translate-content"}, href=True)
+        product_link = product_elem["href"]
 
+        # Get the image link
+        img_elem = product.find("div", attrs={"class": "sh-dgr__thumbnail"}).find("a", href=True)
+        image_link = img_elem["href"]
 
-            cursor = db.cursor()
-            insert_info = (search, price, product_name, product_desc, image, link)
-            # Add the product info to the database if all fields populated
-            if all(insert_info):
-                cursor.execute("""INSERT INTO results (search, price, product_name,
-                                  product_description, image_link, product_link)
-                                  VALUES(%s, %s, %s, %s, %s, %s)""", insert_info)
-                db.commit()
-                results.append(insert_info)
+        # Get the product price
+        price = product.find("span", attrs={"class": "Nr22bf"}).getText()
+        float_price = formatPrice(price)
+
+        cursor = db.cursor()
+        # Create a 32 character id for the product to be uniquely identified with
+        id = uuid.uuid1().hex
+
+        insert_info = (search, float_price, formatted_name, image_link, product_link, id)
+        print(insert_info)
+        # Add the product info to the database if all fields populated
+        if all(insert_info):
+            cursor.execute("""INSERT INTO results (search, price, product_name,
+                              image_link, product_link, product_id)
+                              VALUES(%s, %s, %s, %s, %s, %s)""", insert_info)
+            db.commit()
+            results.append(insert_info)
 
     results.sort(key=lambda tup: tup[1])
 
