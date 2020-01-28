@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 class NavBar extends Component {
   render(){
     return(
-      <ul class="navbar">
-        <a id="navbarPage">Home</a>
-        <a id="navbarPage">Popular Products</a>
-      </ul>
+      <div class="topnav">
+        <a>Home</a>
+        <a>Popular Products</a>
+      </div>
     )
   }
 }

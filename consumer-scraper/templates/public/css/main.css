@@ -1,22 +1,20 @@
-.navbar {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+.topnav {
   background-color: #333;
+  overflow: hidden;
+  color: white;
 }
 
-a#navbarPage {
+.topnav a {
   float: left;
-  color: white;
-  font-family: arial;
+  display: block;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  font-size: 17px;
 }
 
-a#navbarPage:hover {
-  background-color: #111;
+.topnav a:hover {
+  background-color: #ddd;
 }
 
 .search {
@@ -27,7 +25,7 @@ a#navbarPage:hover {
 }
 
 .searchSubmit {
-  background-color: #4CAF50; /* Green */
+  background-color: #8A2BE2;
   color: white;
   padding: 0px 32px;
   text-align: center;
@@ -51,7 +49,7 @@ a#navbarPage:hover {
 }
 
 .productLink {
-  background-color: #4CAF50; /* Green */
+  background-color: #8A2BE2;
   border: none;
   color: white;
   padding: 15px 32px;
@@ -81,7 +79,7 @@ a#navbarPage:hover {
   width: 40px;
   height: 40px;
   line-height: 40px;
-  background-color: green;
+  background-color: #8A2BE2;
   font-family: arial;
   color: white;
   margin: 30px auto 0px 10px;
