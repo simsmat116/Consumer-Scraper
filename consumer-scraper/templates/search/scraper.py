@@ -37,9 +37,10 @@ def scrape_search_results(search, db):
         product_elem = product.find("a", attrs={"class": "sHaywe VQN8fd translate-content"}, href=True)
         product_link = product_elem["href"]
 
+
         # Get the image link
-        img_elem = product.find("div", attrs={"class": "sh-dgr__thumbnail"}).find("a", href=True)
-        image_link = img_elem["href"]
+        img_elem = product.find('img', id=lambda x: x and x.startswith('srpresultimg'), src=True)
+        image_link = img_elem["src"]
 
         # Get the product price
         price = product.find("span", attrs={"class": "Nr22bf"}).getText()
@@ -50,7 +51,6 @@ def scrape_search_results(search, db):
         id = uuid.uuid1().hex
 
         insert_info = (search, float_price, formatted_name, image_link, product_link, id)
-        print(insert_info)
         # Add the product info to the database if all fields populated
         if all(insert_info):
             cursor.execute("""INSERT INTO results (search, price, product_name,
