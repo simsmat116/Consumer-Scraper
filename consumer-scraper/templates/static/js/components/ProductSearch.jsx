@@ -76,11 +76,10 @@ class ProductSearch extends Component {
             </form>
             {this.state.products.map(product => (
               <Product
-              productDesc={product.product_desc}
               productName={product.product_name}
               productLink={product.product_link}
+              productID={product.product_id}
               price={product.price}
-              imageLink={product.image_link}
               />
             ))}
             <PageNav onClicked={this.pageClick} numPages={this.state.numPages} currPage={this.state.page} />

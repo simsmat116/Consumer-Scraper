@@ -42,9 +42,9 @@ def get_search_results():
         context["results"].append({
             "product_name": result[2],
             "price": result[1],
-            "image_link": result[3],
+            "image_link": result[5],
             "product_link": result[4],
-            "product_id": result[5]
+            "product_id": result[3]
         })
 
     cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))

@@ -35,7 +35,7 @@ def scrape_search_results(search, db):
 
         # Get the product link
         product_elem = product.find("a", attrs={"class": "sHaywe VQN8fd translate-content"}, href=True)
-        product_link = product_elem["href"]
+        product_link = "https://www.google.com" + product_elem["href"]
 
 
         # Get the image link
@@ -50,7 +50,7 @@ def scrape_search_results(search, db):
         # Create a 32 character id for the product to be uniquely identified with
         id = uuid.uuid1().hex
 
-        insert_info = (search, float_price, formatted_name, image_link, product_link, id)
+        insert_info = (search, float_price, formatted_name, id, product_link, image_link)
         # Add the product info to the database if all fields populated
         if all(insert_info):
             cursor.execute("""INSERT INTO results (search, price, product_name,
