@@ -26,12 +26,12 @@ def search_page():
 def get_search_results():
     search = request.args.get('q')
     page = request.args.get('p')
-    offset = (int(page) - 1) * 10
+    offset = (int(page) - 1) * 4
     db = get_db()
     cursor = db.cursor()
     # Query the database to see if there are existing records
     cursor.execute("""SELECT * FROM results WHERE search = %s ORDER BY price
-                      LIMIT 10 OFFSET %s""", (search, offset))
+                      LIMIT 4 OFFSET %s""", (search, offset))
     results = cursor.fetchall()
     # If no results in the database, scrape Google Shopping
     if not results:
@@ -50,6 +50,6 @@ def get_search_results():
     cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))
     num_records = cursor.fetchone()[0]
 
-    context["num_pages"] = math.ceil(int(num_records) / 10)
+    context["num_pages"] = math.ceil(int(num_records) / 4)
 
     return jsonify(**context)

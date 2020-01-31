@@ -60,5 +60,5 @@ def scrape_search_results(search, db):
             results.append(insert_info)
 
     results.sort(key=lambda tup: tup[1])
-
-    return results[:10]
+    index = min(4, len(results))
+    return results[:index]

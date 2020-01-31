@@ -37,15 +37,23 @@
 
 .product {
   box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  height: auto;
-  padding-bottom: 20px;
+  width: 350px;
+  height: 250px;
+  padding-bottom: 20px 20px 0px 20px;
   text-align: center;
-  padding-top: 20px;
+  padding-top: 10px;
   font-family: arial;
   border-radius: 25px;
-  margin-top: 30px;
-  margin: 30px auto;
+  margin: 30px 30px;
+  display: inline-block;
+}
+
+.productName {
+  display: inline-block;
+  white-space: nowrap;
+  width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .productLink {
