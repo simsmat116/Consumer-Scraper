@@ -53,20 +53,19 @@ def get_search_results():
 
     return jsonify(**context)
 
-@app.route('/api/popular-products/<int:product_id>', methods=['POST'])
+@app.route('/api/popular_products/<string:product_id>', methods=['POST'])
 def update_product_vistits(product_id):
     db = get_db()
     cursor = db.cursor()
     # Check the popular_products table to see if the product exists
-    cursor.execute("SELECT num_visits FROM popular_products WHERE product_id = %s", (product_id))
+    cursor.execute("SELECT num_visits FROM popular_products WHERE product_id= %s ", (product_id, ))
     record = cursor.fetchone()
 
     if not record:
-        cursor.execute("INSERT INTO popular_products(product_id, num_vists) VALUES(%s, %s)", (product_id, 1))
+        cursor.execute("INSERT INTO popular_products (product_id, num_visits) VALUES(%s, %s)", (product_id, 1))
     else:
         updated_visits = record[0] + 1
-        cursor.execute("UPDATE popular_products SET num_vists = %s WHERE product_id = %s", (updated_visits, product_id))
+        cursor.execute("UPDATE popular_products SET num_visits = %s WHERE product_id=%s", (updated_visits, product_id))
 
     db.commit()
-
-    return
+    return '200'
