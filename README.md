@@ -1,0 +1,1 @@
+Consumer Scraper is a web application that focuses on scraping the web to help them find products that they are interested in. The technologies used for this web app are React for the front-end, and Flask and MySQL for the backend. 
