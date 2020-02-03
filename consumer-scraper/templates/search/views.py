@@ -15,11 +15,9 @@ def get_db():
     return db
 
 @app.route('/')
-def home_page():
-    return render_template('index.html')
-
 @app.route('/search')
-def search_page():
+@app.route('/popular_products')
+def home_page():
     return render_template('index.html')
 
 @app.route('/api/search', methods=['GET'])

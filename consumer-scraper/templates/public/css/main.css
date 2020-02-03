@@ -10,11 +10,12 @@
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  color: white;
   font-size: 17px;
 }
 
 .topnav a:hover {
-  background-color: #ddd;
+  background-color: #404040;
 }
 
 .search {

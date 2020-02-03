@@ -5,7 +5,7 @@ class NavBar extends Component {
     return(
       <div class="topnav">
         <a>Home</a>
-        <a>Popular Products</a>
+        <a href='/popular_products'>Popular Products</a>
       </div>
     )
   }
