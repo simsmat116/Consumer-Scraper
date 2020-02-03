@@ -67,3 +67,25 @@ def update_product_vistits(product_id):
 
     db.commit()
     return '200'
+
+@app.route('/api/popular_products/', methods=['GET'])
+def get_popular_products():
+    db = get_db()
+    cursor = db.cursor()
+
+    # Get the 12 most popular products in the database
+    cursor.execute("""SELECT r.product_name, r.price, r.product_link, r.product_id FROM results AS r INNER JOIN popular_products AS pp
+                      ON r.product_id = pp.product_id ORDER BY pp.num_visits LIMIT 12""")
+    products = cursor.fetchall()
+
+    context = { "results": [] }
+    # Iterate through all of the products found
+    for product in products:
+        context["results"].append({
+            "product_name": product[0],
+            "price": product[1],
+            "product_link": product[2],
+            "product_id": product[3]
+        })
+
+    return jsonify(**context)
