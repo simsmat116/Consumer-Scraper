@@ -22,7 +22,8 @@ class ProductSearch extends Component {
     });
   }
 
-  handleSearch(){
+  handleSearch(e){
+    e.preventDefault();
     const url = "api/search?q=" + this.state.search + "&p=" + String(this.state.page);
     console.log(url);
     fetch(url, { credentials: 'same-origin' })
