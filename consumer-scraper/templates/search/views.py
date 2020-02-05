@@ -3,6 +3,7 @@ from flask import render_template, request, jsonify
 from templates.search import scraper
 import mysql.connector
 import math
+import account_helper
 
 def get_db():
     # Establish connection to consumer_scraper database
@@ -70,8 +71,7 @@ def update_product_vistits(product_id):
 
 @app.route('/api/popular_products/', methods=['GET'])
 def get_popular_products():
-    db = get_db()
-    cursor = db.cursor()
+    cursor = get_db().cursor()
 
     # Get the 12 most popular products in the database
     cursor.execute("""SELECT r.product_name, r.price, r.product_link, r.product_id FROM results AS r INNER JOIN popular_products AS pp
@@ -87,5 +87,28 @@ def get_popular_products():
             "product_link": product[2],
             "product_id": product[3]
         })
+
+    return jsonify(**context)
+
+@app.route('/api/accounts/login', methods=['POST'])
+def login_user():
+    if not request.is_json:
+        # Need to return invalid request
+        return
+
+    # Get the POSTed data
+    content = request.get_json()
+
+    if 'username' not in content or 'password' not in content:
+        # Need to return invalid request
+        return
+
+    cursor = get_db().cursor()
+    cursor.execute("SELECT password FROM users WHERE username = %s", (content['username']))
+    db_password = cursor.fetchone()[0]
+
+    context = {"login_status": "failure"}
+    if account_helper.verify_password(content['password'], db_password):
+        context["login_status"] = "success"
 
     return jsonify(**context)

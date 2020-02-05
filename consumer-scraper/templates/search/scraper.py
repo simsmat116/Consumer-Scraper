@@ -37,7 +37,6 @@ def scrape_search_results(search, db):
         product_elem = product.find("a", attrs={"class": "sHaywe VQN8fd translate-content"}, href=True)
         product_link = "https://www.google.com" + product_elem["href"]
 
-
         # Get the image link
         img_elem = product.find('img', id=lambda x: x and x.startswith('srpresultimg'), src=True)
         image_link = img_elem["src"]
