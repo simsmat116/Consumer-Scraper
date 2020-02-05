@@ -1,9 +1,8 @@
 from templates import app
 from flask import render_template, request, jsonify
-from templates.search import scraper
+from templates.search import scraper, account_helper
 import mysql.connector
 import math
-import account_helper
 
 def get_db():
     # Establish connection to consumer_scraper database
