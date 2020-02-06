@@ -5,11 +5,9 @@ def check_account_post(request):
     """Validate the POST request for accounts."""
     # Check if valid json
     invalid_json = not request.is_json
-
     content = request.get_json()
     # Check for both username and password
     missing_info = 'username' not in content or 'password' not in content
-
     return invalid_json or missing_info
 
 

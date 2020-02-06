@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import uuid
 from nltk.corpus import stopwords
+from templates.search.views import get_db
 
 def format_product_name(product_name):
     # Remove the ... from end of string if it exists
@@ -18,7 +19,8 @@ def format_price(price):
     return float(price)
 
 
-def db_insert_product(results, db):
+def db_insert_product(results):
+        db = get_db()
         cursor = db.cursor()
         cursor.execute("""INSERT INTO results (search, price, product_name,
                           product_id, product_link)
@@ -45,7 +47,7 @@ def scrape_info(search, product, html_classes):
     return (search, float_price, formatted_name, id, product_link, )
 
 
-def get_product_info(search, products, html_classes, db):
+def get_product_info(search, products, html_classes):
     """Gather products based on the type one product HTML."""
     results = []
 
@@ -53,13 +55,13 @@ def get_product_info(search, products, html_classes, db):
         # Get the product information
         insert_info = scrape_info(search, product, html_classes)
         if all(insert_info):
-            db_insert_product(insert_info, db)
+            db_insert_product(insert_info)
             results.append(insert_info)
 
     return results
 
 
-def scrape_search_results(search, db):
+def scrape_search_results(search):
     # Url for Google Shopping
     url = "https://www.google.com/search?psb=1&tbm=shop&q=" + search
 
@@ -82,7 +84,7 @@ def scrape_search_results(search, db):
             "link": "VQN8fd sHaywe translate-content",
             "price": "Nr22bf"
         }
-        results = get_product_info(search, products_one, html_classes, db)
+        results = get_product_info(search, products_one, html_classes)
     else:
         html_classes = {
             "name_element": "h3",
@@ -90,7 +92,7 @@ def scrape_search_results(search, db):
             "link": "shntl hy2WroIfzrX__merchant-name",
             "price": "Nr22bf"
         }
-        results = get_product_info(search, products_two, html_classes, db)
+        results = get_product_info(search, products_two, html_classes)
 
     results.sort(key=lambda tup: tup[1])
     # Return eight results if possible

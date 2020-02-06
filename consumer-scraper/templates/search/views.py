@@ -32,7 +32,7 @@ def get_search_results():
     results = cursor.fetchall()
     # If no results in the database, scrape Google Shopping
     if not results:
-        results = scraper.scrape_search_results(search, db)
+        results = scraper.scrape_search_results(search)
 
     context = { "results": [] }
     for result in results:
