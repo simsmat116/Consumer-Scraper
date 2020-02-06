@@ -28,7 +28,7 @@ def get_search_results():
     db = get_db()
     cursor = db.cursor()
     # Query the database to see if there are existing records
-    cursor.execute("""SELECT * FROM results WHERE search = %s ORDER BY price LIMIT 8 OFFSET %s""", (search, offset))
+    cursor.execute('SELECT * FROM results WHERE search = %s ORDER BY price LIMIT 8 OFFSET %s', (search, offset))
     results = cursor.fetchall()
     # If no results in the database, scrape Google Shopping
     if not results:
@@ -56,25 +56,29 @@ def update_product_vistits(product_id):
     db = get_db()
     cursor = db.cursor()
     # Check the popular_products table to see if the product exists
-    cursor.execute("SELECT num_visits FROM popular_products WHERE product_id= %s ", (product_id, ))
+    cursor.execute('SELECT num_visits FROM popular_products WHERE product_id= %s ',  (product_id, ))
     record = cursor.fetchone()
 
     if not record:
-        cursor.execute("INSERT INTO popular_products (product_id, num_visits) VALUES(%s, %s)", (product_id, 1))
+        cursor.execute('INSERT INTO popular_products (product_id, num_visits) VALUES(%s, %s)',
+                       (product_id, 1))
     else:
         updated_visits = record[0] + 1
-        cursor.execute("UPDATE popular_products SET num_visits = %s WHERE product_id=%s", (updated_visits, product_id))
+        cursor.execute('UPDATE popular_products SET num_visits = %s WHERE product_id=%s',
+                        (updated_visits, product_id))
 
     db.commit()
     return '200'
 
 @app.route('/api/popular_products/', methods=['GET'])
 def get_popular_products():
-    cursor = get_db().cursor()
+    db = get_db()
+    cursor = db.cursor()
 
     # Get the 12 most popular products in the database
-    cursor.execute("""SELECT r.product_name, r.price, r.product_link, r.product_id FROM results AS r INNER JOIN popular_products AS pp
-                      ON r.product_id = pp.product_id ORDER BY pp.num_visits LIMIT 12""")
+    cursor.execute('''SELECT r.product_name, r.price, r.product_link, r.product_id FROM results AS r INNER JOIN popular_products
+                      AS pp ON r.product_id = pp.product_id ORDER BY pp.num_visits LIMIT 12''')
+
     products = cursor.fetchall()
 
     context = { "results": [] }
@@ -91,23 +95,46 @@ def get_popular_products():
 
 @app.route('/api/accounts/login', methods=['POST'])
 def login_user():
-    if not request.is_json:
-        # Need to return invalid request
-        return
+    if account_helper.check_account_post(request):
+        return 'Invalid Request', '400'
 
-    # Get the POSTed data
     content = request.get_json()
-
-    if 'username' not in content or 'password' not in content:
-        # Need to return invalid request
-        return
-
-    cursor = get_db().cursor()
-    cursor.execute("SELECT password FROM users WHERE username = %s", (content['username']))
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT password FROM users WHERE username = %s', (content['username'],))
     db_password = cursor.fetchone()[0]
 
     context = {"login_status": "failure"}
     if account_helper.verify_password(content['password'], db_password):
         context["login_status"] = "success"
 
+    return jsonify(**context)
+
+@app.route('/api/accounts/create', methods=['POST'])
+def create_account():
+    if account_helper.check_account_post(request):
+        return 'Invalid Request', '400'
+
+    content = request.get_json()
+
+    db_password = account_helper.set_password(content['password'])
+
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM users WHERE username = %s', (content['username'],))
+    result = cursor.fetchone()
+
+    context = {'account_status': '', "message": '' }
+
+    if result:
+        context['account_status'] = 'failure'
+        context['message'] = 'Account already exists.'
+        return jsonify(**context)
+
+    print("Making it here.")
+    cursor.execute('INSERT INTO users (username, password) VALUES(%s, %s)', (content['username'], db_password,))
+    db.commit()
+
+    context['account_status'] = 'success'
+    context['message'] = 'Account successfully created.'
     return jsonify(**context)

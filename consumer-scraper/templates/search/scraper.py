@@ -34,7 +34,7 @@ def scrape_search_results(search, db):
         formatted_name = formatProductName(product_name)
 
         # Get the product link
-        product_elem = product.find("a", attrs={"class": "sHaywe VQN8fd translate-content"}, href=True)
+        product_elem = product.find("a", attrs={"class": "VQN8fd sHaywe translate-content"}, href=True)
         product_link = "https://www.google.com" + product_elem["href"]
 
         # Get the image link
@@ -53,7 +53,7 @@ def scrape_search_results(search, db):
         # Add the product info to the database if all fields populated
         if all(insert_info):
             cursor.execute("""INSERT INTO results (search, price, product_name,
-                              image_link, product_link, product_id)
+                              product_id, product_link, image_link)
                               VALUES(%s, %s, %s, %s, %s, %s)""", insert_info)
             db.commit()
             results.append(insert_info)
