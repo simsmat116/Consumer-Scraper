@@ -3,18 +3,61 @@ import requests
 import uuid
 from nltk.corpus import stopwords
 
-def formatProductName(product_name):
+def format_product_name(product_name):
     # Remove the ... from end of string if it exists
     product_name = product_name.replace('.', '')
     # Remove stop words such as 'and' from the string
     filtered_words = [word for word in product_name.split(' ') if word not in stopwords.words('english')]
     return ' '.join(filtered_words)
 
-def formatPrice(price):
+
+def format_price(price):
     # Remove the $ and end period
     price = price[1:-1].replace(",", "")
     # Return the price as a float
     return float(price)
+
+
+def db_insert_product(results, db):
+        cursor = db.cursor()
+        cursor.execute("""INSERT INTO results (search, price, product_name,
+                          product_id, product_link)
+                          VALUES(%s, %s, %s, %s, %s)""", results)
+        db.commit()
+
+
+def scrape_info(search, product, html_classes):
+    # Get the product name / description and formatting it
+    product_name = product.find(html_classes["name_element"], attrs={"class": html_classes["name"]}).getText()
+    formatted_name = format_product_name(product_name)
+
+    # Get the product link
+    product_elem = product.find("a", attrs={"class": html_classes["link"]}, href=True)
+    product_link = "https://www.google.com" + product_elem["href"]
+
+    # Get the product price
+    price = product.find("span", attrs={"class": html_classes["price"]}).getText()
+    float_price = format_price(price)
+
+    # Create a 32 character id for the product to be uniquely identified with
+    id = uuid.uuid1().hex
+
+    return (search, float_price, formatted_name, id, product_link, )
+
+
+def get_product_info(search, products, html_classes, db):
+    """Gather products based on the type one product HTML."""
+    results = []
+
+    for product in products:
+        # Get the product information
+        insert_info = scrape_info(search, product, html_classes)
+        if all(insert_info):
+            db_insert_product(insert_info, db)
+            results.append(insert_info)
+
+    return results
+
 
 def scrape_search_results(search, db):
     # Url for Google Shopping
@@ -28,35 +71,26 @@ def scrape_search_results(search, db):
     soup = BeautifulSoup(response.text, "html.parser")
     results = []
     # Loop through the results to get price and product description
-    for product in soup.findAll("div", attrs={"class": "uMfazd EpWqse"}):
-        # Get the product name / description and formatting it
-        product_name = product.find("h4", attrs={"class": "A2sOrd"}).getText()
-        formatted_name = formatProductName(product_name)
+    products_one = soup.findAll("div", attrs={"class": "uMfazd EpWqse"})
+    products_two = soup.findAll("div", attrs={"class": "sh-dlr__list-result"})
 
-        # Get the product link
-        product_elem = product.find("a", attrs={"class": "VQN8fd sHaywe translate-content"}, href=True)
-        product_link = "https://www.google.com" + product_elem["href"]
-
-        # Get the image link
-        img_elem = product.find('img', id=lambda x: x and x.startswith('srpresultimg'), src=True)
-        image_link = img_elem["src"]
-
-        # Get the product price
-        price = product.find("span", attrs={"class": "Nr22bf"}).getText()
-        float_price = formatPrice(price)
-
-        cursor = db.cursor()
-        # Create a 32 character id for the product to be uniquely identified with
-        id = uuid.uuid1().hex
-
-        insert_info = (search, float_price, formatted_name, id, product_link, image_link)
-        # Add the product info to the database if all fields populated
-        if all(insert_info):
-            cursor.execute("""INSERT INTO results (search, price, product_name,
-                              product_id, product_link, image_link)
-                              VALUES(%s, %s, %s, %s, %s, %s)""", insert_info)
-            db.commit()
-            results.append(insert_info)
+    if products_one:
+        # The classes of html elements containing information
+        html_classes = {
+            "name_element": "h4",
+            "name": "A2sOrd",
+            "link": "VQN8fd sHaywe translate-content",
+            "price": "Nr22bf"
+        }
+        results = get_product_info(search, products_one, html_classes, db)
+    else:
+        html_classes = {
+            "name_element": "h3",
+            "name": "xsRiS",
+            "link": "shntl hy2WroIfzrX__merchant-name",
+            "price": "Nr22bf"
+        }
+        results = get_product_info(search, products_two, html_classes, db)
 
     results.sort(key=lambda tup: tup[1])
     # Return eight results if possible
