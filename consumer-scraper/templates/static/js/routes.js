@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Route, Switch } from 'react-router';
 import ProductSearch from './components/ProductSearch';
-import PopularProducts from './components/PopularProducts'
+import PopularProducts from './components/PopularProducts';
 // import more components
 export default (
   <BrowserRouter>

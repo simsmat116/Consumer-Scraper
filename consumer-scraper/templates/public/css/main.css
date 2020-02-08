@@ -14,6 +14,22 @@
   font-size: 17px;
 }
 
+.login {
+  text-align: center;
+  float: right;
+  display: block;
+  padding: 14px 16px;
+  text-decoration: none;
+  width: 100px;
+  background-color: #333;
+  color: white;
+  font-size: 17px;
+}
+
+.login:hover {
+  background-color: #404040;
+}
+
 .topnav a:hover {
   background-color: #404040;
 }
@@ -117,50 +133,39 @@
   background-color: rgba(0,0,0, 0.5);
 }
 
-.login {
-  position: absolute;
-  top: 10%;
-  right: 25%;
-  bottom: 10%;
-  left: 25%;
-  background: white;
-  border-radius: 25px;
-  margin: auto;
-}
-
-
-.loginForm {
-  position: absolute;
-  margin-top: 60px;
-  margin-left: 210px;
-  margin-right: auto;
-  left: 0;
-  right: 0;
+.formContainer {
+  margin: 20px auto 20px auto;
 }
 
 .loginLabel {
-  font-family: "arial";
+  width: 250px;
+  display: block;
+  margin: auto;
+  font-family: arial;
   font-size: 20px;
+  margin-top: 20px;
+  color: black;
 }
 
 .loginField {
-  font-family: "arial";
-  font-size: 20px;
+  width: 250px;
   display: block;
-  height: 40px;
-  width: 300px;
-  margin-bottom: 20px;
+  margin: auto;
+  height: 30px;
 }
 
 .loginSubmit {
+  width: 150px;
+  display: block;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 30px;
   background-color: #8A2BE2;
+  border: none;
   color: white;
-  padding: 0px 32px;
+  padding: 15px 32px;
   text-align: center;
   text-decoration: none;
   font-size: 16px;
-  height: 40px;
   border-radius: 10px;
-  margin-left: 55px;
-  width: 200px;
 }

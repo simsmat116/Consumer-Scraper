@@ -14,11 +14,10 @@ def get_db():
     )
     return db
 
-@app.route('/')
-@app.route('/search')
-@app.route('/popular_products')
-def home_page():
-    return render_template('index.html')
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template("index.html")
 
 @app.route('/api/search', methods=['GET'])
 def get_search_results():
