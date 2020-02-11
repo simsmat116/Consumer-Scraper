@@ -169,3 +169,13 @@
   font-size: 16px;
   border-radius: 10px;
 }
+
+.loginError {
+  width: 250px;
+  display: block;
+  margin: auto;
+  font-family: arial;
+  font-size: 20px;
+  margin-top: 10px;
+  color: red;
+}

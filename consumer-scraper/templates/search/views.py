@@ -100,10 +100,13 @@ def login_user():
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT password FROM users WHERE username = %s', (content['username'],))
-    db_password = cursor.fetchone()[0]
+    db_password = cursor.fetchone()
 
     context = {"login_status": "failure"}
-    if account_helper.verify_password(content['password'], db_password):
+    if not db_password:
+        return context
+
+    if account_helper.verify_password(content['password'], db_password[0]):
         context["login_status"] = "success"
 
     return jsonify(**context)
