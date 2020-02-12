@@ -25,8 +25,15 @@ class NavBar extends Component {
       topRight = <Login success={this.handleLoginSuccess} />
     }
     else{
-      topRight = <div class="login">{localStorage.getItem('username')}</div>
-      topRight = <div class="login" onClick={this.handleLogout}>Log Out</div>
+      topRight = (
+                    <div class="login">{localStorage.getItem('username')}
+                      <div class="loginDropMenu">
+                        <div>Your profile</div>
+                        <div>Your message</div>
+                        <div onClick={this.handleLogout}>Logout</div>
+                      </div>
+                    </div>
+                 );
     }
 
     return(

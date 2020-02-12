@@ -26,8 +26,33 @@
   font-size: 17px;
 }
 
+.loginDropMenu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.loginDropMenu div {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.loginDropMenu div:hover {
+  background-color: #F0F0F0;
+}
+
 .login:hover {
   background-color: #404040;
+}
+
+.login:hover .loginDropMenu {
+  display: block;
 }
 
 .topnav a:hover {
