@@ -204,3 +204,30 @@
   margin-top: 10px;
   color: red;
 }
+
+.topBar {
+  color: black;
+  text-align: center;
+  width: 443px;
+  padding: 15px;
+  font-family: arial;
+  float: left;
+}
+
+.topBar2 {
+  color: black;
+  text-align: center;
+  width: 443px;
+  padding: 15px;
+  font-family: arial;
+  float: left;
+  background-color: #F0F0F0;
+}
+
+.topBar2:hover {
+  background-color: #f9f9f9;
+}
+
+.topBar:hover {
+  background-color: #f9f9f9;
+}

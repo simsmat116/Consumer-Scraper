@@ -4,7 +4,7 @@ import Popup from "reactjs-popup";
 class Login extends Component {
   constructor(props){
     super(props);
-    this.state = { username: "", password: "", failedLogin: false};
+    this.state = { username: "", password: "", failedLogin: false, isLogginIn: true };
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleUserChange = this.handleUserChange.bind(this);
     this.handleSignOn = this.handleSignOn.bind(this);
@@ -79,6 +79,8 @@ class Login extends Component {
 
     return(
       <Popup trigger={<div className="login"> Login </div>} onClose={this.handleClose} modal>
+        <div class="topBar">Login</div>
+        <div class="topBar2">Account Creation</div>
         <label class="loginLabel">Username</label>
         <input type="text" class="loginField" onChange={this.handleUserChange} />
         <label class="loginLabel">Password</label>
