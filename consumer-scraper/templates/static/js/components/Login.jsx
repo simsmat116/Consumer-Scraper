@@ -4,11 +4,12 @@ import Popup from "reactjs-popup";
 class Login extends Component {
   constructor(props){
     super(props);
-    this.state = { username: "", password: "", failedLogin: false, isLogginIn: true };
+    this.state = { username: "", password: "", failedLogin: false, isLoggingIn: true };
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleUserChange = this.handleUserChange.bind(this);
     this.handleSignOn = this.handleSignOn.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.handleLoginSwitch = this.handleLoginSwitch.bind(this);
   }
 
   handleUserChange(e){
@@ -69,6 +70,17 @@ class Login extends Component {
     })
   }
 
+  handleLoginSwitch(e){
+    let switchToCreation = e.target.innerText === 'Account Creation' && this.state.isLoggingIn;
+    let switchToLogin = e.target.innerText === 'Login' && !this.state.isLoggingIn;
+
+    if(switchToCreation || switchToLogin){
+      this.setState({
+        isLoggingIn: !this.state.isLoggingIn
+      })
+    }
+  }
+
   render(){
     let loginError;
     // Determine if error text should be displayed
@@ -76,11 +88,13 @@ class Login extends Component {
       loginError = <div class="loginError">Error: The entered username or password is incorrect.</div>
     }
 
+    let loginClass = this.state.isLoggingIn ? "top-bar-curr" : "top-bar-click";
+    let creationClass = this.state.isLoggingIn ?  "top-bar-click" : "top-bar-curr";
 
     return(
       <Popup trigger={<div className="login"> Login </div>} onClose={this.handleClose} modal>
-        <div class="topBar">Login</div>
-        <div class="topBar2">Account Creation</div>
+        <div class={loginClass} onClick={this.handleLoginSwitch}>Login</div>
+        <div class={creationClass} onClick={this.handleLoginSwitch}>Account Creation</div>
         <label class="loginLabel">Username</label>
         <input type="text" class="loginField" onChange={this.handleUserChange} />
         <label class="loginLabel">Password</label>
