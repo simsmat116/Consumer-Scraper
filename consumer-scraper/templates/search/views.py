@@ -132,7 +132,6 @@ def create_account():
         context['message'] = 'Account already exists.'
         return jsonify(**context)
 
-    print("Making it here.")
     cursor.execute('INSERT INTO users (username, password) VALUES(%s, %s)', (content['username'], db_password,))
     db.commit()
 

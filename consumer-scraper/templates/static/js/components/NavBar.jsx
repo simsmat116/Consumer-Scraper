@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Popup from "reactjs-popup";
-import Login from "./Login";
+import LoginPopup from "./LoginPopup";
 
 class NavBar extends Component {
   constructor(props){
@@ -22,7 +22,7 @@ class NavBar extends Component {
     // Determine if a user is logged in
     let topRight;
     if(!localStorage.getItem('username')){
-      topRight = <Login success={this.handleLoginSuccess} />
+      topRight = <LoginPopup success={this.handleLoginSuccess} />
     }
     else{
       topRight = (
