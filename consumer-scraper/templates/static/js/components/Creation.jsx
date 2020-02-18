@@ -25,6 +25,7 @@ class AccountCreation extends Component {
   }
 
   handleAccountCreation(){
+    alert("HEH");
     if(this.state.password !== this.state.password2){
       this.setState({
         errorMsg: "Passwords do not match."
@@ -32,6 +33,7 @@ class AccountCreation extends Component {
       return;
     }
 
+    alert('HELLO THERE');
 
     fetch("/api/accounts/create", {
         method: "POST",
@@ -79,6 +81,7 @@ class AccountCreation extends Component {
         <input type="text" class="loginField" onChange={this.handleUserChange} />
         <label class="loginLabel">Password</label>
         <input type="password" class="loginField" onChange={this.handlePasswordChange} />
+        <label class="loginLabel">Re-type Password</label>
         <input type="password" class="loginField" onChange={this.handlePassword2Change} />
         {loginError}
         <input type="submit" class="loginSubmit" onClick={this.handleAccountCreation} />
@@ -87,3 +90,5 @@ class AccountCreation extends Component {
   }
 
 };
+
+export default AccountCreation;

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Popup from "reactjs-popup";
 import Login from "./Login";
+import AccountCreation from "./Creation"
 
 class LoginPopup extends Component {
   constructor(props){
@@ -22,6 +23,9 @@ class LoginPopup extends Component {
 
   render(){
 
+    // Determine which form to display
+    let form = this.state.isLoggingIn ? <Login success={this.props.success} /> : <AccountCreation success={this.props.success} />;
+
     // Determine what the classes for 'Login' and 'Account Creation' to determine how they are displayed
     let loginClass = this.state.isLoggingIn ? "top-bar-curr" : "top-bar-click";
     let creationClass = this.state.isLoggingIn ?  "top-bar-click" : "top-bar-curr";
@@ -30,7 +34,7 @@ class LoginPopup extends Component {
       <Popup trigger={<div className="login"> Login </div>} onClose={this.handleClose} modal>
         <div class={loginClass} onClick={this.handleLoginSwitch}>Login</div>
         <div class={creationClass} onClick={this.handleLoginSwitch}>Account Creation</div>
-        <Login success={this.props.success} />
+        {form}
       </Popup>
     )
   }
