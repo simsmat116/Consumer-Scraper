@@ -68,9 +68,9 @@ class ProductSearch extends Component {
   render() {
     // Render each posts
     return (
-      <div>
+      <div class="search-container">
         <NavBar />
-        <div style={{textAlign:'center'}}>
+        <div>
           <form>
             <input class="search" type="text" placeholder="What are you shopping for?" onChange={this.handleSearchChange}/>
             <input type="submit" class="searchSubmit" onClick={this.handleSearch} />

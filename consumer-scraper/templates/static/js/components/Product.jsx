@@ -27,15 +27,18 @@ class Product extends Component {
 
   render(){
     return(
-      <div class="product">
-        <p><b>Product Name:</b> </p>
-        <p class="productName">{this.props.productName}</p>
-        <p><b>Price:</b></p>
-        <p> {this.props.price}</p>
-        <a product_id={this.props.productID} href={this.props.productLink}
-           onClick={this.handleLinkClick} class="productLink" target="_blank">
-           View Product
-        </a>
+      <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+            <div class="product">
+                <p class="product-content"><b>Product Name:</b> </p>
+                <p class="product-content">{this.props.productName}</p>
+                <p class="product-price"><b>Price:</b> {this.props.price}</p>
+                <a product_id={this.props.productID} href={this.props.productLink}
+                onClick={this.handleLinkClick} class="product-link" target="_blank">
+                  View Product
+                </a>
+            </div>
+          </div>
       </div>
     )
   }

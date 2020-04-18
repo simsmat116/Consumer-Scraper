@@ -1,62 +1,5 @@
-.topnav {
-  background-color: #333;
-  overflow: hidden;
-  color: white;
-}
-
-.topnav a {
-  float: left;
-  display: block;
+.search-container {
   text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  color: white;
-  font-size: 17px;
-}
-
-.login {
-  text-align: center;
-  float: right;
-  display: block;
-  padding: 14px 16px;
-  text-decoration: none;
-  width: 100px;
-  background-color: #333;
-  color: white;
-  font-size: 17px;
-}
-
-.loginDropMenu {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-.loginDropMenu div {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.loginDropMenu div:hover {
-  background-color: #F0F0F0;
-}
-
-.login:hover {
-  background-color: #404040;
-}
-
-.login:hover .loginDropMenu {
-  display: block;
-}
-
-.topnav a:hover {
-  background-color: #404040;
 }
 
 .search {
@@ -79,42 +22,41 @@
 
 .product {
   box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.2);
-  width: 350px;
+  width: 900px;
   height: 250px;
-  padding-bottom: 20px 20px 0px 20px;
-  text-align: center;
-  padding-top: 10px;
+  padding: 40px 20px 0px 175px;
   font-family: arial;
   border-radius: 25px;
   margin: 30px 30px;
   display: inline-block;
 }
 
-.productName {
-  display: inline-block;
+.product-content {
+  text-align: left;
+  width: 690px;
+  margin-bottom: 20px;
   white-space: nowrap;
-  width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.productLink {
+.product-price {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.product-link {
+  float: left;
   background-color: #8A2BE2;
   border: none;
   color: white;
-  padding: 15px 32px;
-  text-align: center;
+  padding: 14px 32px;
   text-decoration: none;
-  display: inline-block;
   font-size: 16px;
   border-radius: 10px;
 }
 
-.productImage {
-  height: 150px;
-}
-
-.productLink:hover{
+.product-link:hover {
   background-color: #4B0082;
 }
 
