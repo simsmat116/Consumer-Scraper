@@ -73,7 +73,7 @@ def scrape_search_results(search):
     soup = BeautifulSoup(response.text, "html.parser")
     results = []
     # Loop through the results to get price and product description
-    products_one = soup.findAll("div", attrs={"class": "uMfazd EpWqse"})
+    products_one = soup.findAll("div", attrs={"class": "sh-dgr__gr-auto sh-dgr__grid-result"})
     products_two = soup.findAll("div", attrs={"class": "sh-dlr__list-result"})
 
     if products_one:
