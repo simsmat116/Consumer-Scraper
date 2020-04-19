@@ -14,6 +14,8 @@ class ProductSearch extends Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.pageClick = this.pageClick.bind(this);
+    this.nextPageClick = this.nextPageClick.bind(this);
+    this.prevPageClick = this.prevPageClick.bind(this);
   }
 
   fetchPageResults(pageNum){
@@ -52,6 +54,8 @@ class ProductSearch extends Component {
       page: this.state.page - 1
     });
 
+    alert(this.state.page);
+
     this.fetchPageResults(this.state.page);
     window.scrollTo(0, 0)
   }
@@ -81,6 +85,19 @@ class ProductSearch extends Component {
   }
 
   render() {
+    // Pagination is not displayed when there are no products to be displayed
+    let pageNav;
+    if(this.state.products.length){
+      pageNav = <PageNav
+        prevPage={this.prevPageClick}
+        newPage={this.pageClick}
+        nextPage={this.nextPageClick}
+        numPages={this.state.numPages}
+        currPage={this.state.page}
+      />
+    }
+
+
     // Render each posts
     return (
       <div class="search-container">
@@ -98,13 +115,7 @@ class ProductSearch extends Component {
               price={product.price}
               />
             ))}
-            <PageNav
-            prevPage={this.prevPageClick}
-            newPage={this.pageClick}
-            nextPage={this.nextPageClick}
-            numPages={this.state.numPages}
-            currPage={this.state.page}
-            />
+            {pageNav}
         </div>
       </div>
     );

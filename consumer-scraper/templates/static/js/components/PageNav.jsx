@@ -5,7 +5,7 @@ class PageNav extends Component {
     let currPage = this.props.currPage;
     let numPages = this.props.numPages;
     // Array for storing the page buttons in the correct order
-    let prevClass= "", nextClass = "";
+    let prevClass= "page-item", nextClass = "page-item";
     let pages = []
 
     if(currPage == 1){
@@ -19,8 +19,6 @@ class PageNav extends Component {
        pages.unshift(currPage - i)
     }
     else{
-      prevClass = "page-item";
-      nextClass = "page-item";
       pages = [currPage - 1, currPage, currPage + 1]
     }
 

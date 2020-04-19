@@ -96,5 +96,5 @@ def scrape_search_results(search):
 
     results.sort(key=lambda tup: tup[1])
     # Return eight results if possible
-    index = min(8, len(results))
+    index = min(5, len(results))
     return results[:index]

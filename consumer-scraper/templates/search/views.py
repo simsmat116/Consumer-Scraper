@@ -23,11 +23,11 @@ def catch_all(path):
 def get_search_results():
     search = request.args.get('q')
     page = request.args.get('p')
-    offset = (int(page) - 1) * 8
+    offset = (int(page) - 1) * 5
     db = get_db()
     cursor = db.cursor()
     # Query the database to see if there are existing records
-    cursor.execute('SELECT * FROM results WHERE search = %s ORDER BY price LIMIT 8 OFFSET %s', (search, offset))
+    cursor.execute('SELECT * FROM results WHERE search = %s ORDER BY price LIMIT 5 OFFSET %s', (search, offset))
     results = cursor.fetchall()
     # If no results in the database, scrape Google Shopping
     if not results:
@@ -45,12 +45,12 @@ def get_search_results():
     cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))
     num_records = cursor.fetchone()[0]
 
-    context["num_pages"] = math.ceil(int(num_records) / 8)
+    context["num_pages"] = math.ceil(int(num_records) / 5)
 
     return jsonify(**context)
 
 @app.route('/api/popular_products/<string:product_id>', methods=['POST'])
-def update_product_vistits(product_id):
+def update_product_visits(product_id):
     db = get_db()
     cursor = db.cursor()
     # Check the popular_products table to see if the product exists
