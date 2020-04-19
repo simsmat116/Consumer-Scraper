@@ -16,40 +16,10 @@ class ProductSearch extends Component {
     this.pageClick = this.pageClick.bind(this);
   }
 
-  handleSearchChange(e){
-    this.setState({
-      search: e.target.value,
-    });
-  }
-
-  handleSearch(e){
-    e.preventDefault();
-    const url = "api/search?q=" + this.state.search + "&p=" + String(this.state.page);
-    console.log(url);
-    fetch(url, { credentials: 'same-origin' })
-      .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
-        return response.json();
-      })
-      .then((context) => {
-          this.setState({
-            products: context.results,
-            numPages: context.num_pages,
-            page: 1
-          });
-      })
-      .catch(error => console.log(error));
-  }
-
-  pageClick(e){
-    let newPage = parseInt(e.currentTarget.textContent, 10)
-    // Set the page to be the page that the user clicked on
-    this.setState({
-      page: newPage
-    });
+  fetchPageResults(pageNum){
+    // Construct url to be sent to search results API
+    const url = "api/search?q=" + this.state.search + "&p=" + String(pageNum);
     // Send a request to the backend to get products for the certain page
-    const url = "api/search?q=" + this.state.search + "&p=" + String(e.currentTarget.textContent);
-    console.log(url);
     fetch(url, { credentials: 'same-origin' })
       .then((response) => {
         if (!response.ok) throw Error(response.statusText);
@@ -62,7 +32,52 @@ class ProductSearch extends Component {
           });
       })
       .catch(error => console.log(error));
-      window.scrollTo(0, 0)
+  }
+
+  handleSearchChange(e){
+    this.setState({
+      search: e.target.value,
+    });
+  }
+
+  handleSearch(e){
+    e.preventDefault();
+    this.fetchPageResults(this.state.page);
+  }
+
+  prevPageClick(e){
+    e.preventDefault();
+    // Set the page to be the previous page
+    this.setState({
+      page: this.state.page - 1
+    });
+
+    this.fetchPageResults(this.state.page);
+    window.scrollTo(0, 0)
+  }
+
+  pageClick(e){
+    e.preventDefault();
+    // Get the page that was clicked on
+    let newPage = parseInt(e.currentTarget.textContent, 10);
+    // Set the new page in the state
+    this.setState({
+      page: newPage
+    });
+
+    this.fetchPageResults(this.state.page);
+    window.scrollTo(0,0);
+  }
+
+  nextPageClick(e){
+    e.preventDefault();
+    // Set the page to be the next one
+    this.setState({
+      page: this.state.page + 1
+    });
+
+    this.fetchPageResults(this.state.page);
+    window.scrollTo(0, 0)
   }
 
   render() {
@@ -83,7 +98,13 @@ class ProductSearch extends Component {
               price={product.price}
               />
             ))}
-            <PageNav onClicked={this.pageClick} numPages={this.state.numPages} currPage={this.state.page} />
+            <PageNav
+            prevPage={this.prevPageClick}
+            newPage={this.pageClick}
+            nextPage={this.nextPageClick}
+            numPages={this.state.numPages}
+            currPage={this.state.page}
+            />
         </div>
       </div>
     );
