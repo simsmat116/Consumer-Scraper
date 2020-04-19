@@ -16,6 +16,7 @@ class ProductSearch extends Component {
     this.pageClick = this.pageClick.bind(this);
     this.nextPageClick = this.nextPageClick.bind(this);
     this.prevPageClick = this.prevPageClick.bind(this);
+    this.validPage = this.validPage.bind(this);
   }
 
   fetchPageResults(pageNum){
@@ -47,8 +48,13 @@ class ProductSearch extends Component {
     this.fetchPageResults(this.state.page);
   }
 
+  validPage(page){
+    return page > 0 && page <= this.state.numPages;
+  }
+
   prevPageClick(e){
     e.preventDefault();
+    if(!this.validPage(this.state.page - 1)) return;
     // Set the page to be the previous page
     this.setState({
       page: this.state.page - 1
@@ -75,6 +81,7 @@ class ProductSearch extends Component {
 
   nextPageClick(e){
     e.preventDefault();
+    if(!this.validPage(this.state.page + 1)) return;
     // Set the page to be the next one
     this.setState({
       page: this.state.page + 1

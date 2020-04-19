@@ -10,7 +10,7 @@
 }
 
 .searchSubmit {
-  background-color: #8A2BE2;
+  background-color: #0275d8;
   color: white;
   padding: 0px 32px;
   text-align: center;
@@ -47,7 +47,7 @@
 
 .product-link {
   float: left;
-  background-color: #8A2BE2;
+  background-color: #0275d8;
   border: none;
   color: white;
   padding: 14px 32px;

@@ -28,11 +28,16 @@ class PageNav extends Component {
           <li class={prevClass}>
             <a class="page-link" onClick={this.props.prevPage}>Previous</a>
           </li>
-          {pages.map(page => (
-            <li class="page-item">
+          {pages.map(page => {
+            if(page == currPage)
+              return <li class="page-item active">
+                <a class="page-link" onClick={this.props.newPage}>{page}</a>
+              </li>
+            return <li class="page-item">
               <a class="page-link" onClick={this.props.newPage}>{page}</a>
             </li>
-          ))}
+          }
+          )}
           <li class={nextClass}>
             <a class="page-link" onClick={this.props.nextPage}>Next</a>
           </li>
