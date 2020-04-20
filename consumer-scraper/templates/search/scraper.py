@@ -37,12 +37,22 @@ class ConsumerScraper:
         """Retrieve random proxy to be used in web scraping."""
         return random.choice(self.proxies)
 
-    def nordstrom_search_scrape(self, search):
+    def neiman_search_scrape(self, search):
         proxy = self.get_random_proxy()
         print(proxy)
-        url = "https://needsupply.com/search?q=sweatshirt&search-button=&lang=en_US"
-        resp = requests.get(url, proxies=proxy, headers={"User-Agent": self.user_agent.random })
-        print(resp.text)
+        url = """https://www.neimanmarcus.com/search.jsp?from=brSearch&responsive=true
+                 &request_type=search&search_type=keyword&q=""" + search
+        resp = requests.get(url, headers={"User-Agent": self.user_agent.random })
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        products = soup.findAll("div", attrs={"class": "product-thumbnail grid-33 tablet-grid-33 mobile-grid-50 grid-1600"})
+
+        for product in products:
+            brand = product.find("span", attrs={"class": "designer"}).getText()
+            product_name = product.find("span", attrs={"class": "name"}).getText()
+            price = product.find("div", attrs={"class": "product-thumbnail__sale-price"}).find("span").getText()
+
+            print(brand, product_name, price)
 
 
 
