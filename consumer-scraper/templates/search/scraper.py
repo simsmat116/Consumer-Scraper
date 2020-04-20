@@ -1,8 +1,50 @@
 from bs4 import BeautifulSoup
 import requests
+import random
 import uuid
 from nltk.corpus import stopwords
 from templates.search.views import get_db
+from fake_useragent import UserAgent
+
+class ConsumerScraper:
+    def __init__(self):
+        self.user_agent = UserAgent()
+        self.proxies = self.get_proxies()
+
+    def get_proxies(self):
+        """Retrieve proxies from www.sslproxies.org."""
+        # List for storing proxies
+        proxies = []
+        # Sending request to get the proxies
+        proxy_resp = requests.get("https://www.sslproxies.org/", headers={"User-Agent": self.user_agent.random})
+        soup = BeautifulSoup(proxy_resp.text, "html.parser")
+        # Find the proxy table
+        proxies_table = soup.find(id="proxylisttable")
+
+        # Iterate all rows in the proxy table
+        for row in proxies_table.tbody.find_all("tr"):
+            entries = row.find_all('td')
+            proxy = "http://" + entries[0].string + ":" + entries[1].string
+            # Add the proxy to the proxies list - the dict is used for the proxies parameter in requests.get
+            proxies.append({
+                'http': proxy,
+                'https': proxy
+            })
+
+        return proxies
+
+    def get_random_proxy(self):
+        """Retrieve random proxy to be used in web scraping."""
+        return random.choice(self.proxies)
+
+    def nordstrom_search_scrape(self, search):
+        proxy = self.get_random_proxy()
+        print(proxy)
+        url = "https://needsupply.com/search?q=sweatshirt&search-button=&lang=en_US"
+        resp = requests.get(url, proxies=proxy, headers={"User-Agent": self.user_agent.random })
+        print(resp.text)
+
+
 
 def format_product_name(product_name):
     # Remove the ... from end of string if it exists
