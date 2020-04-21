@@ -5,42 +5,21 @@ import uuid
 from nltk.corpus import stopwords
 from templates.search.views import get_db
 from fake_useragent import UserAgent
-import urllib
+import aiohttp, asyncio
 
 class ConsumerScraper:
     def __init__(self):
         self.user_agent = UserAgent()
         self.proxies = self.__get_proxies()
-        self.__setup_proxy()
-
-    def __request_url(self, url):
-        """Send requests using random user agents."""
-        # Construct the request with a random user agent
-        req = urllib.request.Request(
-            url,
-            data=None,
-            headers={ "User-Agent": self.user_agent.random }
-        )
-        # Send the actual request
-        page = urllib.request.urlopen(req)
-        return page.read().decode("utf-8")
-
-    def __setup_proxy(self):
-        """Set up the proxy being used by urllib request."""
-        # Set up a proxy handler
-        proxy_support = urllib.request.ProxyHandler(self.__get_random_proxy())
-        # Set up a url opener with the proxy handle
-        opener = urllib.request.build_opener(proxy_support)
-        # Install the proxy
-        urllib.request.install_opener(opener)
 
     def __get_proxies(self):
         """Retrieve proxies from www.sslproxies.org."""
         # List for storing proxies
         proxies = []
         # Sending request to get the proxies
-        proxy_resp = self.__request_url("https://www.sslproxies.org/")
-        soup = BeautifulSoup(proxy_resp, "html.parser")
+        headers={ "User-Agent": self.user_agent.random }
+        proxy_resp = requests.get("https://www.sslproxies.org/", headers=headers)
+        soup = BeautifulSoup(proxy_resp.text, "html.parser")
         # Find the proxy table
         proxies_table = soup.find(id="proxylisttable")
 
@@ -48,11 +27,8 @@ class ConsumerScraper:
         for row in proxies_table.tbody.find_all("tr"):
             entries = row.find_all('td')
             proxy = "http://" + entries[0].string + ":" + entries[1].string
-            # Add the proxy to the proxies list - the dict is used for the proxies parameter in requests.get
-            proxies.append({
-                'http': proxy,
-                'https': proxy
-            })
+            # Add the proxy to the proxies list
+            proxies.append(proxy)
 
         return proxies
 
@@ -78,19 +54,38 @@ class ConsumerScraper:
             proxy_support = request.ProxyHandler(request.getproxies())
             # Set up a url opener with the proxy handleSearch
 
+class NeimanScraper(ConsumerScraper):
+    def __init__(self):
+        super(NeimanScraper, self).__init__()
+        self.product_links = []
+
+    def retrieve_product_links(self,search):
+        loop = asyncio.get_event_loop()
+        tasks = []
+        # Retreive 10 pages for the given search
+        for i in range(1, 10):
+            # Create a task for scraping product links on a given page
+            task = asyncio.ensure_future(self.__find_page_links(search, str(i)))
+            tasks.append(task)
+        loop.run_until_complete(asyncio.wait(tasks))
+        print(self.product_links)
 
 
+    async def __find_page_links(self, search, page):
+        """Find product pages from the search results."""
+        product_urls = []
 
-
-        # products = soup.findAll("div", attrs={"class": "product-thumbnail grid-33 tablet-grid-33 mobile-grid-50 grid-1600"})
-        #
-        # for product in products:
-        #     brand = product.find("span", attrs={"class": "designer"}).getText()
-        #     product_name = product.find("span", attrs={"class": "name"}).getText()
-        #     price = product.find("div", attrs={"class": "product-thumbnail__sale-price"}).find("span").getText()
-        #
-        #     print(brand, product_name, price)
-
+        # Craft url for specific page
+        url = """https://www.neimanmarcus.com/search.jsp?from=brSearch&responsive=true
+                 &request_type=search&search_type=keyword&q=sweatshirt&page=""" + page
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
+                response = await resp.read()
+                soup = BeautifulSoup(response, "html.parser")
+                # Obtain the links from the
+                product_links = soup.findAll("a", attrs={"class": "product-thumbnail__link"}, href=True)
+                # Add the links to the list of links
+                self.product_links.extend([link["href"] for link in product_links])
 
 
 def format_product_name(product_name):
