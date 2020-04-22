@@ -14,7 +14,7 @@ def get_db():
 
 class ConsumerScraper:
     def __init__(self):
-        """Initalize class with user agent, proxies, and database connection."""
+        """Initalize class with user agent, proxies, product pages, and database connection."""
         self.user_agent = UserAgent()
         self.proxies = self._get_proxies()
         self._conn = mysql.connector.connect(
@@ -23,6 +23,7 @@ class ConsumerScraper:
                         passwd=app.config["MYSQL_PASSWORD"],
                         database=app.config["MYSQL_DB"])
         self._cursor = self._conn.cursor()
+        self.product_links = []
 
 
     def __del__(self):
@@ -67,7 +68,6 @@ class ConsumerScraper:
 class NeimanScraper(ConsumerScraper):
     def __init__(self):
         super(NeimanScraper, self).__init__()
-        self.product_links = []
 
     def _retrieve_product_pages(self,search):
         """Retrieve the product pages using asynchronous requests."""
@@ -97,8 +97,34 @@ class NeimanScraper(ConsumerScraper):
                 # Add the links to the list of links
                 self.product_links.extend([link["href"] for link in product_links])
 
+    def _scheduled_product_page_process(self):
+        loop = asyncio.get_event_loop()
+        tasks = []
 
-    async def __
+        for product_url in self.product_links:
+            task = asyncio.ensure_future(self._find_product_information(product_url))
+            tasks.append(task)
+
+        loop.run_until_complete(asyncio.wait(tasks))
+
+
+    async def _find_product_information(self, url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
+                response = await resp.read()
+                soup = BeautifulSoup(response. "html.parser")
+
+                name = soup.find("span", attrs={"class": "product-heading__name__product"}).getText()
+                price = soup.find("span", attrs={ "class": "price" }).getText()
+                # Define dctionary used to find the image link
+                image_class = {"class": "slick-slide slick-active slick-current"}
+                image_link = soup.find("div", attrs=image_class).find("img")["src"]
+                # Define dictionary used to find the description
+                description_class = {"class": "product-description__content__cutline-standard"}
+                description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
+                # Description is a unordered list of items
+                description = " ".join([item.getText() for item in description_items])
+
 
 
 # def format_product_name(product_name):
