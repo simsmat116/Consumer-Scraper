@@ -4,7 +4,7 @@ from fake_useragent import UserAgent
 import mysql.connector
 from templates.search.views import get_db
 from templates import app
-import aiohttp, asyncioß
+import aiohttp, asyncio
 
 
 class ConsumerScraper:
@@ -69,48 +69,51 @@ class NeimanScraper(ConsumerScraper):
         loop = asyncio.get_event_loop()
         tasks = []
         # Retreive 10 pages for the given search
-        async with ClientSession() as session:
-            for i in range(1, 10):
-                # Create a task for scraping product links on a given page
-                task = asyncio.ensure_future(self._find_product_links(session, search, str(i)))
-                tasks.append(task)
-            loop.run_until_complete(asyncio.wait(tasks))
+        for i in range(1, 2):
+            # Create a task for scraping product links on a given page
+            task = asyncio.ensure_future(self._find_product_links(search, str(i)))
+            tasks.append(task)
+        loop.run_until_complete(asyncio.wait(tasks))
 
 
-    async def _find_product_links(self, session, search, page):
+    async def _find_product_links(self, search, page):
         """Find product pages from the search results."""
-        product_urls = []
-
         # Craft url for specific page
         url = """https://www.neimanmarcus.com/search.jsp?from=brSearch&responsive=true
                  &request_type=search&search_type=keyword&q=sweatshirt&page=""" + page
-        async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
+                response = await resp.read()
+                soup = BeautifulSoup(response, "html.parser")
+                # Obtain the links from the
+                product_links = soup.findAll("a", attrs={"class": "product-thumbnail__link"}, href=True)
+                # Add the links to the list of links
+                self.product_links.extend([link["href"] for link in product_links])
+
+    async def _schedule_product_page_process(self):
+        self._session = aiohttp.ClientSession()
+        try:
+            for product_url in self.product_links:
+                product_info = await self._find_product_information(product_url)
+        finally:
+            await self._session.close()
+
+
+
+    async def _find_product_information(self, url):
+        async with self._session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
             response = await resp.read()
             soup = BeautifulSoup(response, "html.parser")
-            # Obtain the links from the
-            product_links = soup.findAll("a", attrs={"class": "product-thumbnail__link"}, href=True)
-            # Add the links to the list of links
-            self.product_links.extend([link["href"] for link in product_links])
-
-    def _scheduled_product_page_process(self):
-        loop = asyncio.get_event_loop()
-        tasks = []
-
-        async with ClientSession() as session:
-
-            for product_url in self.product_links:
-                task = asyncio.ensure_future(self._find_product_information(session, product_url))
-                tasks.append(task)
-            loop.run_until_complete(asyncio.wait(tasks))
-
-
-    async def _find_product_information(self, session, url):
-        async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
-            response = await resp.read()
-            soup = BeautifulSoup(response. "html.parser")
-
             name = soup.find("span", attrs={"class": "product-heading__name__product"}).getText()
-            price = soup.find("span", attrs={ "class": "price" }).getText()
+            price = soup.find("span", attrs={ "class": "promo-final-price" })
+            if not price:
+                retail_price = soup.find("span", attrs={ "class": "retailPrice" })
+                # If neither price exists, then the product is sold out
+                if not retail_price:
+                    return None
+                price = retail_price
+
+            price = price.getText()
             # Define dctionary used to find the image link
             image_class = {"class": "slick-slide slick-active slick-current"}
             image_link = soup.find("div", attrs=image_class).find("img")["src"]
@@ -119,6 +122,7 @@ class NeimanScraper(ConsumerScraper):
             description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
             # Description is a unordered list of items
             description = " ".join([item.getText() for item in description_items])
+            return (name, price, image_link, description)
 
 
 
