@@ -69,56 +69,56 @@ class NeimanScraper(ConsumerScraper):
         loop = asyncio.get_event_loop()
         tasks = []
         # Retreive 10 pages for the given search
-        for i in range(1, 10):
-            # Create a task for scraping product links on a given page
-            task = asyncio.ensure_future(self._find_product_links(search, str(i)))
-            tasks.append(task)
-        loop.run_until_complete(asyncio.wait(tasks))
+        async with ClientSession() as session:
+            for i in range(1, 10):
+                # Create a task for scraping product links on a given page
+                task = asyncio.ensure_future(self._find_product_links(session, search, str(i)))
+                tasks.append(task)
+            loop.run_until_complete(asyncio.wait(tasks))
 
 
-    async def _find_product_links(self, search, page):
+    async def _find_product_links(self, session, search, page):
         """Find product pages from the search results."""
         product_urls = []
 
         # Craft url for specific page
         url = """https://www.neimanmarcus.com/search.jsp?from=brSearch&responsive=true
                  &request_type=search&search_type=keyword&q=sweatshirt&page=""" + page
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
-                response = await resp.read()
-                soup = BeautifulSoup(response, "html.parser")
-                # Obtain the links from the
-                product_links = soup.findAll("a", attrs={"class": "product-thumbnail__link"}, href=True)
-                # Add the links to the list of links
-                self.product_links.extend([link["href"] for link in product_links])
+        async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
+            response = await resp.read()
+            soup = BeautifulSoup(response, "html.parser")
+            # Obtain the links from the
+            product_links = soup.findAll("a", attrs={"class": "product-thumbnail__link"}, href=True)
+            # Add the links to the list of links
+            self.product_links.extend([link["href"] for link in product_links])
 
     def _scheduled_product_page_process(self):
         loop = asyncio.get_event_loop()
         tasks = []
 
-        for product_url in self.product_links:
-            task = asyncio.ensure_future(self._find_product_information(product_url))
-            tasks.append(task)
+        async with ClientSession() as session:
 
-        loop.run_until_complete(asyncio.wait(tasks))
+            for product_url in self.product_links:
+                task = asyncio.ensure_future(self._find_product_information(session, product_url))
+                tasks.append(task)
+            loop.run_until_complete(asyncio.wait(tasks))
 
 
-    async def _find_product_information(self, url):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
-                response = await resp.read()
-                soup = BeautifulSoup(response. "html.parser")
+    async def _find_product_information(self, session, url):
+        async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
+            response = await resp.read()
+            soup = BeautifulSoup(response. "html.parser")
 
-                name = soup.find("span", attrs={"class": "product-heading__name__product"}).getText()
-                price = soup.find("span", attrs={ "class": "price" }).getText()
-                # Define dctionary used to find the image link
-                image_class = {"class": "slick-slide slick-active slick-current"}
-                image_link = soup.find("div", attrs=image_class).find("img")["src"]
-                # Define dictionary used to find the description
-                description_class = {"class": "product-description__content__cutline-standard"}
-                description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
-                # Description is a unordered list of items
-                description = " ".join([item.getText() for item in description_items])
+            name = soup.find("span", attrs={"class": "product-heading__name__product"}).getText()
+            price = soup.find("span", attrs={ "class": "price" }).getText()
+            # Define dctionary used to find the image link
+            image_class = {"class": "slick-slide slick-active slick-current"}
+            image_link = soup.find("div", attrs=image_class).find("img")["src"]
+            # Define dictionary used to find the description
+            description_class = {"class": "product-description__content__cutline-standard"}
+            description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
+            # Description is a unordered list of items
+            description = " ".join([item.getText() for item in description_items])
 
 
 
