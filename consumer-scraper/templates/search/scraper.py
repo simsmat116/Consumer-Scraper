@@ -4,12 +4,7 @@ from fake_useragent import UserAgent
 import mysql.connector
 from templates.search.views import get_db
 from templates import app
-import aiohttp, asyncio
-
-
-def get_db():
-    # Establish connection to consumer_scraper databas
-    return db
+import aiohttp, asyncioß
 
 
 class ConsumerScraper:
