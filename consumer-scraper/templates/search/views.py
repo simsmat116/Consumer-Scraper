@@ -4,15 +4,6 @@ from templates.search import scraper, account_helper
 import mysql.connector
 import math
 
-def get_db():
-    # Establish connection to consumer_scraper database
-    db = mysql.connector.connect(
-      host=app.config['MYSQL_HOST'],
-      user=app.config["MYSQL_USER"],
-      passwd=app.config["MYSQL_PASSWORD"],
-      database=app.config["MYSQL_DB"]
-    )
-    return db
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
