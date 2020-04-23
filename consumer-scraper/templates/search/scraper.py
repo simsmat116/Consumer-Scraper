@@ -1,10 +1,8 @@
 from bs4 import BeautifulSoup
 import requests, random, uuid
 from fake_useragent import UserAgent
-import mysql.connector
-from templates.search.views import get_db
 from templates import app
-import aiohttp, asyncio
+import aiohttp, asyncio, aiomysql
 
 
 class ConsumerScraper:
@@ -12,18 +10,7 @@ class ConsumerScraper:
         """Initalize class with user agent, proxies, product pages, and database connection."""
         self.user_agent = UserAgent()
         self.proxies = self._get_proxies()
-        self._conn = mysql.connector.connect(
-                        host=app.config['MYSQL_HOST'],
-                        user=app.config["MYSQL_USER"],
-                        passwd=app.config["MYSQL_PASSWORD"],
-                        database=app.config["MYSQL_DB"])
-        self._cursor = self._conn.cursor()
         self.product_links = []
-
-
-    def __del__(self):
-        """Destruct the database connection."""
-        self._conn.close()
 
 
     def _get_proxies(self):
@@ -51,13 +38,30 @@ class ConsumerScraper:
         """Retrieve random proxy to be used in web scraping."""
         return random.choice(self.proxies)
 
-    def _insert_product_db(self, product):
-        """Insert product information into the results table."""
 
-        # TO-DO touchup the SQL statement once database changes have been made
-        self._cursor.execute("SQL STATEMENT")
-        # Commit the change the database
-        self._conn.commit()
+    async def _get_db(self):
+        """Retrieve a connection to the database."""
+        conn = await aiomysql.connect(host=app.config["MYSQL_HOST"],
+                                   port=app.config["MYSQL_PORT"],
+                                   user=app.config["MYSQL_USER"],
+                                   password=app.config["MYSQL_PASSWORD"],
+                                   db=app.config["MYSQL_DB"])
+        return conn
+
+    async def _insert_product_db(self, product):
+        """Insert product information into the results table."""
+        # Connect to the database
+        conn = await self._get_db()
+        cursor = await conn.cursor()
+        # Insert the product information into the database
+        await cursor.execute("""INSERT INTO scraped_products (name, description, price, type, search, link, image_link, website)
+                                VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", product)
+
+        # Commit the changes to the database
+        await conn.commit()
+        # Close the connection
+        await cursor.close()
+        conn.close()
 
 
 class NeimanScraper(ConsumerScraper):
@@ -90,11 +94,13 @@ class NeimanScraper(ConsumerScraper):
                 # Add the links to the list of links
                 self.product_links.extend([link["href"] for link in product_links])
 
-    async def _schedule_product_page_process(self):
+    async def _schedule_product_page_process(self, search):
         self._session = aiohttp.ClientSession()
         try:
             for product_url in self.product_links:
                 product_info = await self._find_product_information(product_url)
+                # Add the search into the product dict
+                product_info["search"] = search
         finally:
             await self._session.close()
 
@@ -113,7 +119,7 @@ class NeimanScraper(ConsumerScraper):
                     return None
                 price = retail_price
 
-            price = price.getText()
+            price = int(price.getText().replace("$", "").replace(",", ""))
             # Define dctionary used to find the image link
             image_class = {"class": "slick-slide slick-active slick-current"}
             image_link = soup.find("div", attrs=image_class).find("img")["src"]
@@ -122,7 +128,7 @@ class NeimanScraper(ConsumerScraper):
             description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
             # Description is a unordered list of items
             description = " ".join([item.getText() for item in description_items])
-            return (name, price, image_link, description)
+            return (name, description, price, "", url, image_link, "Neiman Marcus")
 
 
 
