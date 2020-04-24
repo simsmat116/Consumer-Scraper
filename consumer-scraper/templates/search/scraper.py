@@ -98,15 +98,15 @@ class NeimanScraper(ConsumerScraper):
         self._session = aiohttp.ClientSession()
         try:
             for product_url in self.product_links:
-                product_info = await self._find_product_information(product_url)
-                # Add the search into the product dict
-                product_info["search"] = search
+                product_info = await self._find_product_information(product_url, search)
+                # Add the found information into the database
+                await self._insert_product_db(product_info)
         finally:
             await self._session.close()
 
 
-
-    async def _find_product_information(self, url):
+    async def _find_product_information(self, url, search):
+        """Find the product information from the product webpage."""
         async with self._session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
             response = await resp.read()
             soup = BeautifulSoup(response, "html.parser")
@@ -128,7 +128,16 @@ class NeimanScraper(ConsumerScraper):
             description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
             # Description is a unordered list of items
             description = " ".join([item.getText() for item in description_items])
-            return (name, description, price, "", url, image_link, "Neiman Marcus")
+            return (name, description, price, "", search, url, image_link, "Neiman Marcus")
+
+    def handle_products_search(self, search):
+        """Handle all processes for scraping products from Neiman Marcus."""
+        # Retrieve the product pages and store in list
+        self._retrieve_product_pages(search)
+        loop = asyncio.get_event_loop()
+        # Run the process for scraping product pages
+        loop.run_until_complete(self._schedule_product_page_process(search))
+
 
 
 
