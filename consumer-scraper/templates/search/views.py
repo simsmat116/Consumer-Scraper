@@ -1,8 +1,8 @@
 from templates import app
 from flask import render_template, request, jsonify
-from templates.search import scraper, account_helper
-import mysql.connector
+from templates.search import NeimanScraper, account_helper
 import math
+import asyncio
 
 
 @app.route('/', defaults={'path': ''})
@@ -10,35 +10,55 @@ import math
 def catch_all(path):
     return render_template("index.html")
 
-@app.route('/api/search', methods=['GET'])
-def get_search_results():
-    search = request.args.get('q')
-    page = request.args.get('p')
-    offset = (int(page) - 1) * 5
-    db = get_db()
-    cursor = db.cursor()
-    # Query the database to see if there are existing records
-    cursor.execute('SELECT * FROM results WHERE search = %s ORDER BY price LIMIT 5 OFFSET %s', (search, offset))
-    results = cursor.fetchall()
-    # If no results in the database, scrape Google Shopping
-    if not results:
-        results = scraper.scrape_search_results(search)
+@app.route('/api/scrape_products', methods=['POST'])
+def scrape_results():
+    """Receive POST request and scraped information from proper websites."""
+    if not request.is_json:
+        return 'Invalid Requests', '400'
 
-    context = { "results": [] }
-    for result in results:
-        context["results"].append({
-            "product_name": result[2],
-            "price": result[1],
-            "product_link": result[4],
-            "product_id": result[3]
-        })
+    # Retrieve the search from the database
+    search = request.get_json()["search"]
 
-    cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))
-    num_records = cursor.fetchone()[0]
+    loop = asyncio.get_event_loop()
+    # Create list of scrapers objects and tasks to be executed
+    scrapers, tasks = [ NeimanScraper()], []
 
-    context["num_pages"] = math.ceil(int(num_records) / 5)
+    for scraper in scrapers:
+        tasks.append(asyncio.ensure_future(scraper.handle_products_search(search)))
 
-    return jsonify(**context)
+    # Run all the scraping tasks to be completed
+    asyncio.run_until_complete(tasks)
+    
+
+
+
+
+
+    # offset = (int(page) - 1) * 5
+    # db = get_db()
+    # cursor = db.cursor()
+    # # Query the database to see if there are existing records
+    # cursor.execute('SELECT * FROM results WHERE search = %s LIMIT 5 OFFSET %s', (search, offset))
+    # results = cursor.fetchall()
+    # # If no results in the database, scrape Google Shopping
+    # if not results:
+    #     results = scraper.scrape_search_results(search)
+    #
+    # context = { "results": [] }
+    # for result in results:
+    #     context["results"].append({
+    #         "product_name": result[2],
+    #         "price": result[1],
+    #         "product_link": result[4],
+    #         "product_id": result[3]
+    #     })
+    #
+    # cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))
+    # num_records = cursor.fetchone()[0]
+    #
+    # context["num_pages"] = math.ceil(int(num_records) / 5)
+    #
+    # return jsonify(**context)
 
 @app.route('/api/popular_products/<string:product_id>', methods=['POST'])
 def update_product_visits(product_id):

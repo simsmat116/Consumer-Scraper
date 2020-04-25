@@ -54,6 +54,7 @@ class ConsumerScraper:
         conn = await self._get_db()
         cursor = await conn.cursor()
         # Insert the product information into the database
+        print(product)
         await cursor.execute("""INSERT INTO scraped_products (name, description, price, type, search, link, image_link, website)
                                 VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", product)
 
@@ -100,32 +101,34 @@ class NeimanScraper(ConsumerScraper):
             for product_url in self.product_links:
                 product_info = await self._find_product_information(product_url, search)
                 # Add the found information into the database
-                await self._insert_product_db(product_info)
+                if product_info:
+                    await self._insert_product_db(product_info)
         finally:
             await self._session.close()
 
 
     async def _find_product_information(self, url, search):
-        """Find the product information from the product webpage."""
         async with self._session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
             response = await resp.read()
             soup = BeautifulSoup(response, "html.parser")
-            name = soup.find("span", attrs={"class": "product-heading__name__product"}).getText()
+            name = soup.find("span", attrs={"class": "product-heading__name__product"})
             price = soup.find("span", attrs={ "class": "promo-final-price" })
+            # If there is no promo price, try to find the retail price
             if not price:
-                retail_price = soup.find("span", attrs={ "class": "retailPrice" })
-                # If neither price exists, then the product is sold out
-                if not retail_price:
-                    return None
-                price = retail_price
-
-            price = int(price.getText().replace("$", "").replace(",", ""))
+                price = soup.find("span", attrs={ "class": "retailPrice" })
             # Define dctionary used to find the image link
             image_class = {"class": "slick-slide slick-active slick-current"}
-            image_link = soup.find("div", attrs=image_class).find("img")["src"]
+            image_link = soup.find("div", attrs=image_class).find("img")
             # Define dictionary used to find the description
             description_class = {"class": "product-description__content__cutline-standard"}
             description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
+            # If one of these is not include, it is not a valid product
+            if not all([name, price, image_link, description_items]):
+                return None
+            # Get the product info if these elements exists
+            name = name.getText()
+            price = float(price.getText().replace("$", "").replace(",", ""))
+            image_link = image_link["src"]
             # Description is a unordered list of items
             description = " ".join([item.getText() for item in description_items])
             return (name, description, price, "", search, url, image_link, "Neiman Marcus")
@@ -137,7 +140,6 @@ class NeimanScraper(ConsumerScraper):
         loop = asyncio.get_event_loop()
         # Run the process for scraping product pages
         loop.run_until_complete(self._schedule_product_page_process(search))
-
 
 
 
