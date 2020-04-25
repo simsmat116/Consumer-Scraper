@@ -21,7 +21,7 @@ class ProductSearch extends Component {
 
   fetchPageResults(pageNum){
     // Construct url to be sent to search results API
-    const url = "api/search?q=" + this.state.search + "&p=" + String(pageNum);
+    const url = "api/products?q=" + this.state.search + "&p=" + String(pageNum);
     // Send a request to the backend to get products for the certain page
     fetch(url, { credentials: 'same-origin' })
       .then((response) => {

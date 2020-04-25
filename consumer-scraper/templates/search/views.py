@@ -1,8 +1,19 @@
 from templates import app
 from flask import render_template, request, jsonify
 from templates.search import NeimanScraper, account_helper
+import mysql.connector
 import math
 import asyncio
+
+def get_db():
+    # Establish connection to consumer_scraper database
+    db = mysql.connector.connect(
+      host=app.config['MYSQL_HOST'],
+      user=app.config["MYSQL_USER"],
+      passwd=app.config["MYSQL_PASSWORD"],
+      database=app.config["MYSQL_DB"]
+    )
+    return db
 
 
 @app.route('/', defaults={'path': ''})
@@ -19,6 +30,12 @@ def scrape_results():
     # Retrieve the search from the database
     search = request.get_json()["search"]
 
+    conn = get_db()
+    cursor = cursor()
+    cursor.execute("SELECT * FROM scraped_products WHERE search = %s", (search,))
+    if cursor.fetchone():
+        return '201', 'Created'
+
     loop = asyncio.get_event_loop()
     # Create list of scrapers objects and tasks to be executed
     scrapers, tasks = [ NeimanScraper()], []
@@ -28,37 +45,44 @@ def scrape_results():
 
     # Run all the scraping tasks to be completed
     asyncio.run_until_complete(tasks)
-    
+
+    return '201', 'Created'
 
 
+@app.route('/api/retrieve_products', methods=['GET'])
+def retrieve_results():
+    """Retrieve the results from the database based on the search"""
+    search = request.args.get('q')
+    page = request.args.get('p')
+    offset = (int(page) - 1) * 10
+    db = get_db()
+    cursor = db.cursor()
+    # Query the database to see if there are existing records
+    cursor.execute("""SELECT name, description, price, link, image_link, website
+                      FROM scraped_products WHERE search = %s ORDER BY created_at LIMIT 5 OFFSET %s""", (search, offset))
+    results = cursor.fetchall()
+    # If no results in the database, scrape Google Shopping
+    if not results:
+        results = scraper.scrape_search_results(search)
 
+    context = { "results": [] }
+    for result in results:
+        context["results"].append({
+            "product_name": result[0],
+            "product_description": result[1],
+            "price": result[2],
+            "product_link": result[3],
+            "product_id": 0,
+            "image_link": result[4],
+            "website": result[5]
+        })
 
+    cursor.execute("SELECT COUNT(*) FROM scraped_products WHERE search = %s", (search,))
+    num_records = cursor.fetchone()[0]
 
-    # offset = (int(page) - 1) * 5
-    # db = get_db()
-    # cursor = db.cursor()
-    # # Query the database to see if there are existing records
-    # cursor.execute('SELECT * FROM results WHERE search = %s LIMIT 5 OFFSET %s', (search, offset))
-    # results = cursor.fetchall()
-    # # If no results in the database, scrape Google Shopping
-    # if not results:
-    #     results = scraper.scrape_search_results(search)
-    #
-    # context = { "results": [] }
-    # for result in results:
-    #     context["results"].append({
-    #         "product_name": result[2],
-    #         "price": result[1],
-    #         "product_link": result[4],
-    #         "product_id": result[3]
-    #     })
-    #
-    # cursor.execute("SELECT COUNT(*) FROM results WHERE search = %s", (search,))
-    # num_records = cursor.fetchone()[0]
-    #
-    # context["num_pages"] = math.ceil(int(num_records) / 5)
-    #
-    # return jsonify(**context)
+    context["num_pages"] = math.ceil(int(num_records) / 10)
+
+    return jsonify(**context)
 
 @app.route('/api/popular_products/<string:product_id>', methods=['POST'])
 def update_product_visits(product_id):
