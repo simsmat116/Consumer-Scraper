@@ -19,4 +19,4 @@ class DevelopmentConfig(BaseCongig):
     MYSQL_USER = 'root'
     MYSQL_PASSWORD = ''
     MYSQL_DB = 'consumer_scraper'
-    MYSQL_PORT = '3306'
+    MYSQL_PORT = 3306

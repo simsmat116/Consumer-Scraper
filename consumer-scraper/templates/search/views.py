@@ -1,6 +1,7 @@
 from templates import app
-from flask import render_template, request, jsonify
-from templates.search import NeimanScraper, account_helper
+from quart import render_template, request, jsonify
+from templates.search import account_helper
+from templates.search.scraper import NeimanScraper
 import mysql.connector
 import math
 import asyncio
@@ -18,52 +19,51 @@ def get_db():
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def catch_all(path):
-    return render_template("index.html")
+async def catch_all(path):
+    return await render_template("index.html")
 
 @app.route('/api/scrape_products', methods=['POST'])
-def scrape_results():
+async def scrape_results():
     """Receive POST request and scraped information from proper websites."""
-    if not request.is_json:
-        return 'Invalid Requests', '400'
+    print("RUNNING PRODUCT SCRAPING")
+    #if not request.is_json:
+    #    return 'Invalid Requests', '400'
 
     # Retrieve the search from the database
-    search = request.get_json()["search"]
+    search = (await request.get_json())["search"]
 
     conn = get_db()
-    cursor = cursor()
+    cursor = conn.cursor()
     cursor.execute("SELECT * FROM scraped_products WHERE search = %s", (search,))
+    # Return if this search already exists in the database
     if cursor.fetchone():
+        print("HEH")
         return '201', 'Created'
 
-    loop = asyncio.get_event_loop()
+
     # Create list of scrapers objects and tasks to be executed
     scrapers, tasks = [ NeimanScraper()], []
+    loop = asyncio.get_event_loop()
 
     for scraper in scrapers:
-        tasks.append(asyncio.ensure_future(scraper.handle_products_search(search)))
+        loop.create_task(scraper.handle_products_search(search))
 
-    # Run all the scraping tasks to be completed
-    asyncio.run_until_complete(tasks)
-
-    return '201', 'Created'
+    return jsonify({})
 
 
 @app.route('/api/retrieve_products', methods=['GET'])
 def retrieve_results():
     """Retrieve the results from the database based on the search"""
+    print("RUNNING PRODUCT RETRIEVAL")
     search = request.args.get('q')
     page = request.args.get('p')
     offset = (int(page) - 1) * 10
-    db = get_db()
-    cursor = db.cursor()
+    conn = get_db()
+    cursor = conn.cursor()
     # Query the database to see if there are existing records
     cursor.execute("""SELECT name, description, price, link, image_link, website
                       FROM scraped_products WHERE search = %s ORDER BY created_at LIMIT 5 OFFSET %s""", (search, offset))
     results = cursor.fetchall()
-    # If no results in the database, scrape Google Shopping
-    if not results:
-        results = scraper.scrape_search_results(search)
 
     context = { "results": [] }
     for result in results:

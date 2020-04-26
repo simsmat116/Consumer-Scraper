@@ -17,11 +17,32 @@ class ProductSearch extends Component {
     this.nextPageClick = this.nextPageClick.bind(this);
     this.prevPageClick = this.prevPageClick.bind(this);
     this.validPage = this.validPage.bind(this);
+    this.postSearchQuery = this.postSearchQuery.bind(this);
+  }
+
+  postSearchQuery(){
+    // Send a POST request to have backend begin the scraping process
+    fetch("api/scrape_products",
+      { method: 'POST',
+        credentintials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          search: this.state.search
+        })
+      })
+        .then((context) => {
+          // If the POST is unsuccessful, throw an error
+          if (!response.ok) throw Error(response.statusText);
+          return response.json();
+        })
+        .catch(error => console.log(error))
   }
 
   fetchPageResults(pageNum){
     // Construct url to be sent to search results API
-    const url = "api/products?q=" + this.state.search + "&p=" + String(pageNum);
+    const url = "api/retrieve_products?q=" + this.state.search + "&p=" + String(pageNum);
     // Send a request to the backend to get products for the certain page
     fetch(url, { credentials: 'same-origin' })
       .then((response) => {
@@ -45,7 +66,9 @@ class ProductSearch extends Component {
 
   handleSearch(e){
     e.preventDefault();
-    this.fetchPageResults(this.state.page);
+    this.postSearchQuery();
+    // Wait 5 seconds before checking the database
+    setTimeout(this.fetchPageResults(this.state.page), 5000);
   }
 
   validPage(page){

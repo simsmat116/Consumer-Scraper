@@ -54,7 +54,6 @@ class ConsumerScraper:
         conn = await self._get_db()
         cursor = await conn.cursor()
         # Insert the product information into the database
-        print(product)
         await cursor.execute("""INSERT INTO scraped_products (name, description, price, type, search, link, image_link, website)
                                 VALUES(%s, %s, %s, %s, %s, %s, %s, %s)""", product)
 
@@ -69,16 +68,17 @@ class NeimanScraper(ConsumerScraper):
     def __init__(self):
         super(NeimanScraper, self).__init__()
 
-    def _retrieve_product_pages(self,search):
+    async def _retrieve_product_pages(self,search):
         """Retrieve the product pages using asynchronous requests."""
-        loop = asyncio.get_event_loop()
         tasks = []
         # Retreive 10 pages for the given search
+        loop = asyncio.get_event_loop()
+        tasks = []
         for i in range(1, 2):
             # Create a task for scraping product links on a given page
-            task = asyncio.ensure_future(self._find_product_links(search, str(i)))
-            tasks.append(task)
-        loop.run_until_complete(asyncio.wait(tasks))
+            tasks.append(loop.create_task(self._find_product_links(search, str(i))))
+
+        await asyncio.gather(*tasks)
 
 
     async def _find_product_links(self, search, page):
@@ -111,35 +111,32 @@ class NeimanScraper(ConsumerScraper):
         async with self._session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
             response = await resp.read()
             soup = BeautifulSoup(response, "html.parser")
-            name = soup.find("span", attrs={"class": "product-heading__name__product"})
-            price = soup.find("span", attrs={ "class": "promo-final-price" })
-            # If there is no promo price, try to find the retail price
-            if not price:
-                price = soup.find("span", attrs={ "class": "retailPrice" })
-            # Define dctionary used to find the image link
-            image_class = {"class": "slick-slide slick-active slick-current"}
-            image_link = soup.find("div", attrs=image_class).find("img")
-            # Define dictionary used to find the description
-            description_class = {"class": "product-description__content__cutline-standard"}
-            description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
-            # If one of these is not include, it is not a valid product
-            if not all([name, price, image_link, description_items]):
+            try:
+                name = soup.find("span", attrs={"class": "product-heading__name__product"}).getText()
+                price = soup.find("span", attrs={ "class": "promo-final-price" })
+                # If there is no promo price, try to find the retail price
+                if not price:
+                    price = soup.find("span", attrs={ "class": "retailPrice" })
+                price = float(price.getText().replace("$", "").replace(",", ""))
+                # Define dctionary used to find the image link
+                image_class = {"class": "slick-slide slick-active slick-current"}
+                image_link = soup.find("div", attrs=image_class).find("img")["src"]
+                # Define dictionary used to find the description
+                description_class = {"class": "product-description__content__cutline-standard"}
+                # Description is a unordered list of items
+                description_items = soup.find("div", attrs=description_class).find("ul").findAll("li")
+                description = " ".join([item.getText() for item in description_items])
+                return (name, description, price, "", search, url, image_link, "Neiman Marcus")
+            except:
                 return None
-            # Get the product info if these elements exists
-            name = name.getText()
-            price = float(price.getText().replace("$", "").replace(",", ""))
-            image_link = image_link["src"]
-            # Description is a unordered list of items
-            description = " ".join([item.getText() for item in description_items])
-            return (name, description, price, "", search, url, image_link, "Neiman Marcus")
 
-    def handle_products_search(self, search):
+    async def handle_products_search(self, search):
         """Handle all processes for scraping products from Neiman Marcus."""
         # Retrieve the product pages and store in list
-        self._retrieve_product_pages(search)
-        loop = asyncio.get_event_loop()
+        await self._retrieve_product_pages(search)
         # Run the process for scraping product pages
-        loop.run_until_complete(self._schedule_product_page_process(search))
+        print(self.product_links)
+        await self._schedule_product_page_process(search)
 
 
 
