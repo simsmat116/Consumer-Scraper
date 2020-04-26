@@ -25,7 +25,7 @@ async def catch_all(path):
 @app.route('/api/scrape_products', methods=['POST'])
 async def scrape_results():
     """Receive POST request and scraped information from proper websites."""
-    print("RUNNING PRODUCT SCRAPING")
+    print("SCRAPING")
     #if not request.is_json:
     #    return 'Invalid Requests', '400'
 
@@ -37,7 +37,6 @@ async def scrape_results():
     cursor.execute("SELECT * FROM scraped_products WHERE search = %s", (search,))
     # Return if this search already exists in the database
     if cursor.fetchone():
-        print("HEH")
         return '201', 'Created'
 
 
@@ -80,7 +79,7 @@ def retrieve_results():
     cursor.execute("SELECT COUNT(*) FROM scraped_products WHERE search = %s", (search,))
     num_records = cursor.fetchone()[0]
 
-    context["num_pages"] = math.ceil(int(num_records) / 10)
+    context["num_pages"] = max(3, math.ceil(int(num_records) / 10))
 
     return jsonify(**context)
 

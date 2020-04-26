@@ -18,6 +18,7 @@ class ProductSearch extends Component {
     this.prevPageClick = this.prevPageClick.bind(this);
     this.validPage = this.validPage.bind(this);
     this.postSearchQuery = this.postSearchQuery.bind(this);
+    this.fetchPageResults = this.fetchPageResults.bind(this);
   }
 
   postSearchQuery(){
@@ -68,7 +69,7 @@ class ProductSearch extends Component {
     e.preventDefault();
     this.postSearchQuery();
     // Wait 5 seconds before checking the database
-    setTimeout(this.fetchPageResults(this.state.page), 5000);
+    setTimeout(function(){this.fetchPageResults(1)}.bind(this), 5000);
   }
 
   validPage(page){

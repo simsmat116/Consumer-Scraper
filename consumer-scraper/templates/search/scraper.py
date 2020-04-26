@@ -85,7 +85,7 @@ class NeimanScraper(ConsumerScraper):
         """Find product pages from the search results."""
         # Craft url for specific page
         url = """https://www.neimanmarcus.com/search.jsp?from=brSearch&responsive=true
-                 &request_type=search&search_type=keyword&q=sweatshirt&page=""" + page
+                 &request_type=search&search_type=keyword&q={}&page={}""".format(search, page)
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers={"User-Agent": self.user_agent.random}) as resp:
                 response = await resp.read()
@@ -135,7 +135,6 @@ class NeimanScraper(ConsumerScraper):
         # Retrieve the product pages and store in list
         await self._retrieve_product_pages(search)
         # Run the process for scraping product pages
-        print(self.product_links)
         await self._schedule_product_page_process(search)
 
 
