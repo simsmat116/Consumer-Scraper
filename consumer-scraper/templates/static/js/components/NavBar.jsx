@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Popup from "reactjs-popup";
-import LoginPopup from "./LoginPopup";
 
 class NavBar extends Component {
   constructor(props){
@@ -23,7 +22,7 @@ class NavBar extends Component {
     let topRight;
     if(localStorage.getItem('username')){
       topRight = (
-        <ul class="nav navbar-nav navbar-right">
+        <ul class="navbar-nav navbar-right">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Username <span class="caret"></span>
@@ -42,28 +41,24 @@ class NavBar extends Component {
     }
     else{
       topRight = (
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href=""><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-          <li><a href=""><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="modal" href="#signup-popup">
+              <span class="glyphicon glyphicon-log-in"></span> Login
+            </a>
+          </li>
         </ul>
                  );
     }
 
     return(
-      <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="#">Consumer Scraper</a>
-          </div>
-          <ul class="nav navbar-nav">
-            <li class><a href="/">Home</a></li>
-            <li><a href="/popular_products">Popular Products</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href=""><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-            <li><a href=""><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-          </ul>
-        </div>
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Consumer Scraper</a>
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/popular_products">Popular Products</a></li>
+        </ul>
+        {topRight}
       </nav>
     )
   }

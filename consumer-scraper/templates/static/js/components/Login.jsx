@@ -61,20 +61,35 @@ class Login extends Component {
   }
 
   render(){
-    let loginError;
-    // Determine if error text should be displayed
-    if(this.state.failedLogin){
-      loginError = <div class="loginError">Error: The entered username or password is incorrect.</div>
-    }
-
     return(
-      <div>
-        <label class="loginLabel">Username</label>
-        <input type="text" class="loginField" onChange={this.handleUserChange} />
-        <label class="loginLabel">Password</label>
-        <input type="password" class="loginField" onChange={this.handlePasswordChange} />
-        {loginError}
-        <input type="submit" class="loginSubmit" onClick={this.handleSignOn} />
+      <div class="modal" id="singup-popup" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <div class="modal-header">
+              <h4 class="modal-title">Sign In</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <label for="username-field">Username</label>
+                  <input class="form-control" type="text" id="username-field" />
+                </div>
+                <div class="form-group">
+                  <label for="password-field">Password</label>
+                  <input class="form-control" type="password" id="password-field" />
+                </div>
+              </form>
+            </div>
+
+            <div class="modal-footer">
+              Hello world
+            </div>
+
+          </div>
+        </div>
       </div>
     )
   }

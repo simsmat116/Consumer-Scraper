@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Product from './Product'
-import PageNav from './PageNav'
-import NavBar from './NavBar'
+import Product from './Product';
+import PageNav from './PageNav';
+import NavBar from './NavBar';
+import Login from './Login';
 
 
 class ProductSearch extends Component {
@@ -148,6 +149,7 @@ class ProductSearch extends Component {
             ))}
             {pageNav}
         </div>
+        <Login />
       </div>
     );
   }
