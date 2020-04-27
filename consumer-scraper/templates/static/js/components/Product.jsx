@@ -28,7 +28,7 @@ class Product extends Component {
   render(){
     return(
       <div class="row">
-          <div class="col-md-8 col-md-offset-2">
+          <div class="col-md-8 offset-md-2">
             <div class="product">
                 <p class="product-content"><b>Product Name:</b> </p>
                 <p class="product-content">{this.props.productName}</p>
