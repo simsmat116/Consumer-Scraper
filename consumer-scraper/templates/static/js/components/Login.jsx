@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import $ from "jquery";
+import 'bootstrap';
 
 class Login extends Component {
   constructor(props){
     super(props);
-    this.state = this.state = { username: "", password: "", failedLogin: false}
+    this.state = this.state = { username: "", password: "", errorMsg: "test"}
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleUserChange = this.handleUserChange.bind(this);
     this.handleSignOn = this.handleSignOn.bind(this);
@@ -38,31 +40,26 @@ class Login extends Component {
     })
       .then((response) => {
         if(!response.ok) throw Error(response.statusText);
-        return response.json();
+        // TO-DO maintain the logged in state
+        // Remove the popup from the window
+        $("#signup-popup").trigger("click");
+        // Ensuring that the state is not stored if the user were to access this again
+        this.setState({
+          username: "",
+          password: ""
+        })
+
       })
-      .then((context) => {
-        // The username and password are valid
-        if(context.login_status == "success"){
-          localStorage.setItem("username", this.state.username);
-          // Call the success function passed from NavBar component to rerender entire page
-          this.props.success();
-          // Login success, so ensure that error text won't be displayed in future
-          this.setState({
-            failedLogin: false,
-          });
-        }
-        else{
-          // Failed login, set field to true so that error text is rendered
-          this.setState({
-            failedLogin: true,
-          });
-        }
-      });
+      .catch(error => {
+        this.setState({
+          errorMsg: "The username or password you entered is invalid."
+        });
+      })
   }
 
   render(){
     return(
-      <div class="modal" id="singup-popup" tabindex="-1">
+      <div class="modal" id="signup-popup" tabindex="-1">
         <div class="modal-dialog">
           <div class="modal-content">
 
@@ -75,17 +72,18 @@ class Login extends Component {
               <form>
                 <div class="form-group">
                   <label for="username-field">Username</label>
-                  <input class="form-control" type="text" id="username-field" />
+                  <input class="form-control" onChange={this.handleUserChange} value={this.state.username} type="text" id="username-field" />
                 </div>
                 <div class="form-group">
                   <label for="password-field">Password</label>
-                  <input class="form-control" type="password" id="password-field" />
+                  <input class="form-control" onChange={this.handlePasswordChange} value={this.state.password} type="password" id="password-field" />
                 </div>
               </form>
+              <div style={{color: "red"}}>{this.state.errorMsg}</div>
             </div>
 
             <div class="modal-footer">
-              Hello world
+              <button type="button" class="btn btn-primary" onClick={this.handleSignOn}>Sign On</button>
             </div>
 
           </div>

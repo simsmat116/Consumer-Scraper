@@ -53,7 +53,6 @@ async def scrape_results():
 @app.route('/api/retrieve_products', methods=['GET'])
 def retrieve_results():
     """Retrieve the results from the database based on the search"""
-    print("RUNNING PRODUCT RETRIEVAL")
     search = request.args.get('q')
     page = request.args.get('p')
     offset = (int(page) - 1) * 10
@@ -126,31 +125,30 @@ def get_popular_products():
     return jsonify(**context)
 
 @app.route('/api/accounts/login', methods=['POST'])
-def login_user():
-    if account_helper.check_account_post(request):
-        return 'Invalid Request', '400'
+async def login_user():
+    content = await request.get_json()
+    if 'username' not in content or 'password' not in content:
+        return ('Invalid Request', '400')
 
-    content = request.get_json()
+    print(content['username'])
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT password FROM users WHERE username = %s', (content['username'],))
     db_password = cursor.fetchone()
 
-    context = {"login_status": "failure"}
     if not db_password:
-        return context
+        return ('Login Failure', 401)
 
     if account_helper.verify_password(content['password'], db_password[0]):
-        context["login_status"] = "success"
+        return ('Login Success', 200)
 
-    return jsonify(**context)
+    return ('Login Failure', 401)
 
 @app.route('/api/accounts/create', methods=['POST'])
-def create_account():
-    if account_helper.check_account_post(request):
+async def create_account():
+    content = await request.get_json()
+    if 'username' not in content or 'password' not in content:
         return 'Invalid Request', '400'
-
-    content = request.get_json()
 
     db_password = account_helper.set_password(content['password'])
 
