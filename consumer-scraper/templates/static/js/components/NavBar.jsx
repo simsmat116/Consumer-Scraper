@@ -1,31 +1,28 @@
 import React, { Component } from 'react';
 import Popup from "reactjs-popup";
+import cookie from 'react-cookies';
+import Login from './Login';
 
 class NavBar extends Component {
   constructor(props){
     super(props);
-    this.handleLogout = this.handleLogout.bind(this);
-    this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
   }
 
-  handleLogout(){
-    localStorage.removeItem('username');
-    this.forceUpdate();
-  }
-
-  handleLoginSuccess(){
+  handleLogin(){
     this.forceUpdate();
   }
 
   render(){
     // Determine if a user is logged in
+    let username = cookie.load("username");
     let topRight;
-    if(localStorage.getItem('username')){
+    if(username){
       topRight = (
-        <ul class="navbar-nav navbar-right">
+        <ul class="navbar-nav ml-auto">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Username <span class="caret"></span>
+              {username} <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
               <li><a href="#">Profile</a></li>
@@ -59,7 +56,9 @@ class NavBar extends Component {
             <li class="nav-item"><a class="nav-link" href="/popular_products">Popular Products</a></li>
         </ul>
         {topRight}
+        <Login handleLogin={this.handleLogin}/>
       </nav>
+
     )
   }
 }

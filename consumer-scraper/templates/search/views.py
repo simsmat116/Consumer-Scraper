@@ -1,5 +1,5 @@
 from templates import app
-from quart import render_template, request, jsonify
+from quart import render_template, request, jsonify, make_response
 from templates.search import account_helper
 from templates.search.scraper import NeimanScraper
 import mysql.connector
@@ -25,11 +25,7 @@ async def catch_all(path):
 @app.route('/api/scrape_products', methods=['POST'])
 async def scrape_results():
     """Receive POST request and scraped information from proper websites."""
-    print("SCRAPING")
-    #if not request.is_json:
-    #    return 'Invalid Requests', '400'
-
-    # Retrieve the search from the database
+    # Retrieve the search from the request
     search = (await request.get_json())["search"]
 
     conn = get_db()
@@ -37,7 +33,8 @@ async def scrape_results():
     cursor.execute("SELECT * FROM scraped_products WHERE search = %s", (search,))
     # Return if this search already exists in the database
     if cursor.fetchone():
-        return '201', 'Created'
+        print("yes")
+        return await make_response('Product Exists', '200')
 
 
     # Create list of scrapers objects and tasks to be executed
@@ -47,12 +44,14 @@ async def scrape_results():
     for scraper in scrapers:
         loop.create_task(scraper.handle_products_search(search))
 
-    return jsonify({})
+    return await make_response('Created', '201')
 
 
 @app.route('/api/retrieve_products', methods=['GET'])
 def retrieve_results():
     """Retrieve the results from the database based on the search"""
+    username = request.cookies.get('username')
+    print(username)
     search = request.args.get('q')
     page = request.args.get('p')
     offset = (int(page) - 1) * 10
@@ -140,7 +139,9 @@ async def login_user():
         return ('Login Failure', 401)
 
     if account_helper.verify_password(content['password'], db_password[0]):
-        return ('Login Success', 200)
+        resp = await make_response(('Login Success', 200))
+        resp.set_cookie('username', content['username'])
+        return resp
 
     return ('Login Failure', 401)
 

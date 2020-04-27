@@ -40,7 +40,6 @@ class Login extends Component {
     })
       .then((response) => {
         if(!response.ok) throw Error(response.statusText);
-        // TO-DO maintain the logged in state
         // Remove the popup from the window
         $("#signup-popup").trigger("click");
         // Ensuring that the state is not stored if the user were to access this again
@@ -48,6 +47,8 @@ class Login extends Component {
           username: "",
           password: ""
         })
+        // Rerender the navigation bar
+        this.props.handleLogin();
 
       })
       .catch(error => {
