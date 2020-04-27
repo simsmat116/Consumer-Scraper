@@ -24,16 +24,15 @@ class NavBar extends Component {
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {username} <span class="caret"></span>
             </a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Profile</a></li>
-              <li><a href="#">Messages</a></li>
-              <li><a href="#">Settings</a></li>
-              <li><a href="#">Logout</a></li>
-            </ul>
-        </li>
-
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Profile</a>
+              <a class="dropdown-item" href="#">Messages</a>
+              <a class="dropdown-item" href="#">Settings</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Logout</a>
+            </div>
+          </li>
         </ul>
-
       )
     }
     else{
