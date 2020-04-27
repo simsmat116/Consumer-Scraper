@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import $ from "jquery";
+import $ from 'jquery';
 import 'bootstrap';
 
 class Login extends Component {
   constructor(props){
     super(props);
-    this.state = this.state = { username: "", password: "", errorMsg: "test"}
+    this.state = { username: "", password: "", errorMsg: ""}
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleUserChange = this.handleUserChange.bind(this);
     this.handleSignOn = this.handleSignOn.bind(this);
+    this.closeModal = this.closeModal.bind(this)
   }
 
   handleUserChange(e){
@@ -23,6 +24,11 @@ class Login extends Component {
     this.setState({
       password: e.target.value,
     });
+  }
+
+  closeModal(){
+    // Remove the modal using j-query
+    $("#signup-popup").trigger("click");
   }
 
   handleSignOn(){
@@ -40,8 +46,7 @@ class Login extends Component {
     })
       .then((response) => {
         if(!response.ok) throw Error(response.statusText);
-        // Remove the popup from the window
-        $("#signup-popup").trigger("click");
+        this.closeModal();
         // Ensuring that the state is not stored if the user were to access this again
         this.setState({
           username: "",
@@ -80,6 +85,9 @@ class Login extends Component {
                   <input class="form-control" onChange={this.handlePasswordChange} value={this.state.password} type="password" id="password-field" />
                 </div>
               </form>
+              <div>
+                Don't have an account? <a data-toggle="modal" data-target="#create-account-popup" onClick={this.closeModal}>Sign Up</a>
+              </div>
               <div style={{color: "red"}}>{this.state.errorMsg}</div>
             </div>
 

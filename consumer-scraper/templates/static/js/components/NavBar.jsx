@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Popup from "reactjs-popup";
 import cookie from 'react-cookies';
 import Login from './Login';
+import AccountCreation from './CreateAccount'
 
 class NavBar extends Component {
   constructor(props){
@@ -55,7 +56,8 @@ class NavBar extends Component {
             <li class="nav-item"><a class="nav-link" href="/popular_products">Popular Products</a></li>
         </ul>
         {topRight}
-        <Login handleLogin={this.handleLogin}/>
+        <Login handleLogin={this.handleLogin} />
+        <AccountCreation handleCreation={this.handleLogin} />
       </nav>
 
     )

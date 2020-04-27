@@ -149,7 +149,7 @@ async def login_user():
 async def create_account():
     content = await request.get_json()
     if 'username' not in content or 'password' not in content:
-        return 'Invalid Request', '400'
+        return await make_response(('Invalid Request', 400))
 
     db_password = account_helper.set_password(content['password'])
 
@@ -158,16 +158,13 @@ async def create_account():
     cursor.execute('SELECT * FROM users WHERE username = %s', (content['username'],))
     result = cursor.fetchone()
 
-    context = {'account_status': '', "message": '' }
-
     if result:
-        context['account_status'] = 'failure'
-        context['message'] = 'Account already exists.'
-        return jsonify(**context)
+        return await make_response(('Account already exists', 400))
 
     cursor.execute('INSERT INTO users (username, password) VALUES(%s, %s)', (content['username'], db_password,))
     db.commit()
 
-    context['account_status'] = 'success'
-    context['message'] = 'Account successfully created.'
-    return jsonify(**context)
+    resp = await make_response(('Account Created', 201))
+    resp.set_cookie('username', content['username'])
+
+    return resp
