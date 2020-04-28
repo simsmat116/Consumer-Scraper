@@ -65,8 +65,8 @@ class Login extends Component {
 
   render(){
     return(
-      <div class="modal" id="signup-popup" tabindex="-1">
-        <div class="modal-dialog">
+      <div class="modal fade" id="signup-popup" tabindex="-1">
+        <div class="modal-dialog" role="document">
           <div class="modal-content">
 
             <div class="modal-header">
@@ -77,22 +77,22 @@ class Login extends Component {
             <div class="modal-body">
               <form>
                 <div class="form-group">
-                  <label for="username-field">Username</label>
+                  <label for="username-field" class="col-form-label">Username</label>
                   <input class="form-control" onChange={this.handleUserChange} value={this.state.username} type="text" id="username-field" />
                 </div>
                 <div class="form-group">
-                  <label for="password-field">Password</label>
+                  <label for="password-field" class="col-form-label">Password</label>
                   <input class="form-control" onChange={this.handlePasswordChange} value={this.state.password} type="password" id="password-field" />
                 </div>
               </form>
               <div>
-                Don't have an account? <a data-toggle="modal" data-target="#create-account-popup" onClick={this.closeModal}>Sign Up</a>
+                Don't have an account? <a data-toggle="modal" data-target="#create-account-popup" class="text-primary" onClick={this.closeModal}>Sign Up</a>
               </div>
               <div style={{color: "red"}}>{this.state.errorMsg}</div>
             </div>
 
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary" onClick={this.handleSignOn}>Sign On</button>
+              <button type="button" class="btn btn-primary" onClick={this.handleSignOn}>Sign In</button>
             </div>
 
           </div>

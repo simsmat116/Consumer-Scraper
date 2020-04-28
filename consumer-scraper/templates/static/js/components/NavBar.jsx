@@ -7,10 +7,11 @@ import AccountCreation from './CreateAccount'
 class NavBar extends Component {
   constructor(props){
     super(props);
-    this.handleLogin = this.handleLogin.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
   }
 
-  handleLogin(){
+  handleLogout(){
+    cookie.remove('username');
     this.forceUpdate();
   }
 
@@ -30,7 +31,7 @@ class NavBar extends Component {
               <a class="dropdown-item" href="#">Messages</a>
               <a class="dropdown-item" href="#">Settings</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="#">Logout</a>
+              <a class="dropdown-item" onClick={this.handleLogout}>Logout</a>
             </div>
           </li>
         </ul>
@@ -56,8 +57,8 @@ class NavBar extends Component {
             <li class="nav-item"><a class="nav-link" href="/popular_products">Popular Products</a></li>
         </ul>
         {topRight}
-        <Login handleLogin={this.handleLogin} />
-        <AccountCreation handleCreation={this.handleLogin} />
+        <Login handleLogin={() => this.forceUpdate()} />
+        <AccountCreation handleCreation={() => this.forceUpdate()} />
       </nav>
 
     )

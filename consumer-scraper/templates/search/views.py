@@ -149,7 +149,7 @@ async def login_user():
 async def create_account():
     content = await request.get_json()
     if 'username' not in content or 'password' not in content:
-        return await make_response(('Invalid Request', 400))
+        return await make_response(('There was a problem processing your request.', 400))
 
     db_password = account_helper.set_password(content['password'])
 
@@ -159,7 +159,7 @@ async def create_account():
     result = cursor.fetchone()
 
     if result:
-        return await make_response(('Account already exists', 400))
+        return await make_response(('An account with this username already exists.', 400))
 
     cursor.execute('INSERT INTO users (username, password) VALUES(%s, %s)', (content['username'], db_password,))
     db.commit()

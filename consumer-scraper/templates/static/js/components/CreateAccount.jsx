@@ -87,15 +87,15 @@ class AccountCreation extends Component {
             <div class="modal-body">
               <form>
                 <div class="form-group">
-                  <label for="username-field">Username</label>
+                  <label for="username-field" class="col-form-label">Username</label>
                   <input class="form-control" type="text" id="username-field" onChange={this.handleUserChange} />
                 </div>
                 <div class="form-group">
-                  <label for="password-field">Password</label>
-                  <input class="form-control" type="text" id="password-field" onChange={this.handlePasswordChange} />
+                  <label for="password-field" class="col-form-label">Password</label>
+                  <input class="form-control" type="password" id="password-field" onChange={this.handlePasswordChange} />
                 </div>
                 <div class="form-group">
-                  <label for="reenter-password-field">Re-enter Password</label>
+                  <label for="reenter-password-field" class="col-form-label">Re-enter Password</label>
                   <input class="form-control" type="password" id="reenter-password-field" onChange={this.handlePassword2Change} />
                 </div>
               </form>

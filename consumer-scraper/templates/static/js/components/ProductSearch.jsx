@@ -130,13 +130,13 @@ class ProductSearch extends Component {
 
     // Render each posts
     return (
-      <div class="search-container">
+      <div>
         <NavBar />
         <div>
-          <form>
+          <form class="search-container">
             <input class="search" type="text" placeholder="What are you shopping for?" onChange={this.handleSearchChange}/>
             <input type="submit" class="searchSubmit" onClick={this.handleSearch} />
-            </form>
+          </form>
             {this.state.products.map(product => (
               <Product
               productName={product.product_name}
