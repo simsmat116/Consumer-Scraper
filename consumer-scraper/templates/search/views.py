@@ -51,7 +51,6 @@ async def scrape_results():
 def retrieve_results():
     """Retrieve the results from the database based on the search"""
     username = request.cookies.get('username')
-    print(username)
     search = request.args.get('q')
     page = request.args.get('p')
     offset = (int(page) - 1) * 10
@@ -60,26 +59,23 @@ def retrieve_results():
     # Query the database to see if there are existing records
     cursor.execute("""SELECT name, description, price, link, image_link, website
                       FROM scraped_products WHERE search = %s ORDER BY created_at LIMIT 5 OFFSET %s""", (search, offset))
-    results = cursor.fetchall()
+
+    columns = [col[0] for col in cursor.description]
+    # Store each record in a dictionary with appropriate column names
+    results = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
     context = { "results": [] }
     for result in results:
-        context["results"].append({
-            "product_name": result[0],
-            "product_description": result[1],
-            "price": result[2],
-            "product_link": result[3],
-            "product_id": 0,
-            "image_link": result[4],
-            "website": result[5]
-        })
+        context["results"].append(result)
 
+    print(context)
     cursor.execute("SELECT COUNT(*) FROM scraped_products WHERE search = %s", (search,))
     num_records = cursor.fetchone()[0]
 
     context["num_pages"] = max(3, math.ceil(int(num_records) / 10))
 
     return jsonify(**context)
+
 
 @app.route('/api/popular_products/<string:product_id>', methods=['POST'])
 def update_product_visits(product_id):
@@ -99,6 +95,7 @@ def update_product_visits(product_id):
 
     db.commit()
     return '200'
+
 
 @app.route('/api/popular_products/', methods=['GET'])
 def get_popular_products():
@@ -123,6 +120,7 @@ def get_popular_products():
 
     return jsonify(**context)
 
+
 @app.route('/api/accounts/login', methods=['POST'])
 async def login_user():
     content = await request.get_json()
@@ -143,6 +141,7 @@ async def login_user():
         return resp
 
     return ('Login Failure', 401)
+
 
 @app.route('/api/accounts/create', methods=['POST'])
 async def create_account():

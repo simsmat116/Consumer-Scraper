@@ -83,8 +83,6 @@ class ProductSearch extends Component {
       page: this.state.page - 1
     });
 
-    alert(this.state.page);
-
     this.fetchPageResults(this.state.page);
     window.scrollTo(0, 0)
   }
@@ -139,10 +137,12 @@ class ProductSearch extends Component {
           </form>
             {this.state.products.map(product => (
               <Product
-              productName={product.product_name}
-              productLink={product.product_link}
-              productID={product.product_id}
+              productName={product.name}
+              productDesc={product.description}
               price={product.price}
+              productLink={product.link}
+              productIMG={product.image_link}
+              productID={product.product_id}
               />
             ))}
             {pageNav}
