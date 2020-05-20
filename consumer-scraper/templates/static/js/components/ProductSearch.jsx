@@ -13,8 +13,6 @@ class ProductSearch extends Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.pageClick = this.pageClick.bind(this);
-    this.nextPageClick = this.nextPageClick.bind(this);
-    this.prevPageClick = this.prevPageClick.bind(this);
     this.validPage = this.validPage.bind(this);
     this.postSearchQuery = this.postSearchQuery.bind(this);
     this.fetchPageResults = this.fetchPageResults.bind(this);
@@ -75,41 +73,29 @@ class ProductSearch extends Component {
     return page > 0 && page <= this.state.numPages;
   }
 
-  prevPageClick(e){
-    e.preventDefault();
-    if(!this.validPage(this.state.page - 1)) return;
-    // Set the page to be the previous page
-    this.setState({
-      page: this.state.page - 1
-    });
-
-    this.fetchPageResults(this.state.page);
-    window.scrollTo(0, 0)
-  }
-
   pageClick(e){
     e.preventDefault();
     // Get the page that was clicked on
-    let newPage = parseInt(e.currentTarget.textContent, 10);
+    let newPage = this.state.page;
+    let textContent = e.target.textContent;
+    if(textContent === "Previous"){
+      newPage -= 1
+    }
+    else if(textContent === "Next"){
+      newPage += 1;
+    }
+    else{
+      newPage = parseInt(textContent, 10);
+    }
+
+    if(!this.validPage(newPage)) return;
     // Set the new page in the state
     this.setState({
       page: newPage
     });
 
-    this.fetchPageResults(this.state.page);
+    this.fetchPageResults(newPage);
     window.scrollTo(0,0);
-  }
-
-  nextPageClick(e){
-    e.preventDefault();
-    if(!this.validPage(this.state.page + 1)) return;
-    // Set the page to be the next one
-    this.setState({
-      page: this.state.page + 1
-    });
-
-    this.fetchPageResults(this.state.page);
-    window.scrollTo(0, 0)
   }
 
   render() {
@@ -117,9 +103,7 @@ class ProductSearch extends Component {
     let pageNav;
     if(this.state.products.length){
       pageNav = <PageNav
-        prevPage={this.prevPageClick}
         newPage={this.pageClick}
-        nextPage={this.nextPageClick}
         numPages={this.state.numPages}
         currPage={this.state.page}
       />

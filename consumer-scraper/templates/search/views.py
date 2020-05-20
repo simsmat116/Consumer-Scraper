@@ -53,6 +53,7 @@ def retrieve_results():
     username = request.cookies.get('username')
     search = request.args.get('q')
     page = request.args.get('p')
+    print(page)
     offset = (int(page) - 1) * 10
     conn = get_db()
     cursor = conn.cursor()
@@ -67,8 +68,7 @@ def retrieve_results():
     context = { "results": [] }
     for result in results:
         context["results"].append(result)
-
-    print(context)
+        
     cursor.execute("SELECT COUNT(*) FROM scraped_products WHERE search = %s", (search,))
     num_records = cursor.fetchone()[0]
 

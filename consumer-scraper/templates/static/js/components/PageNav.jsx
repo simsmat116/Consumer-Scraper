@@ -26,7 +26,7 @@ class PageNav extends Component {
       <nav class="page-bar" aria-label="...">
         <ul class="pagination">
           <li class={prevClass}>
-            <a class="page-link" onClick={this.props.prevPage}>Previous</a>
+            <a class="page-link" onClick={this.props.newPage}>Previous</a>
           </li>
           {pages.map(page => {
             if(page == currPage)
@@ -39,7 +39,7 @@ class PageNav extends Component {
           }
           )}
           <li class={nextClass}>
-            <a class="page-link" onClick={this.props.nextPage}>Next</a>
+            <a class="page-link" onClick={this.props.newPage}>Next</a>
           </li>
         </ul>
       </nav>
