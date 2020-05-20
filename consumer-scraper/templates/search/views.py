@@ -129,7 +129,6 @@ async def login_user():
     if 'username' not in content or 'password' not in content:
         return ('Invalid Request', '400')
 
-    print(content['username'])
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT password FROM users WHERE username = %s', (content['username'],))
@@ -161,7 +160,8 @@ async def create_account():
     if result:
         return await make_response(('An account with this username already exists.', 400))
 
-    cursor.execute('INSERT INTO users (username, password) VALUES(%s, %s)', (content['username'], db_password,))
+    cursor.execute('INSERT INTO users (username, password, first_name, last_name) VALUES(%s, %s, %s, %s)',
+                    (content['username'], db_password, content['first_name'], content['last_name']))
     db.commit()
 
     resp = await make_response(('Account Created', 201))

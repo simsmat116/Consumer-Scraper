@@ -5,29 +5,33 @@ import 'bootstrap';
 class AccountCreation extends Component {
   constructor(props){
     super(props);
-    this.state = { username: "", password: "", password2: "", errorMsg: ""};
+    this.state = { username: "", password: "", password2: "", errorMsg: "", firstName: "", lastName: ""};
     this.handleUserChange = this.handleUserChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
+    this.handleLastNameChange = this.handleLastNameChange.bind(this);
     this.handlePassword2Change = this.handlePassword2Change.bind(this);
     this.handleAccountCreation = this.handleAccountCreation.bind(this);
   }
 
   handleUserChange(e){
-    this.setState({
-      username: e.target.value
-    });
+    this.setState({ username: e.target.value });
   }
 
   handlePasswordChange(e){
-    this.setState({
-      password: e.target.value
-    });
+    this.setState({ password: e.target.value });
   }
 
   handlePassword2Change(e){
-    this.setState({
-      password2: e.target.value
-    });
+    this.setState({ password2: e.target.value });
+  }
+
+  handleFirstNameChange(e){
+    this.setState({ firstName: e.target.value });
+  }
+
+  handleLastNameChange(e){
+    this.setState({ lastName: e.target.value });
   }
 
   handleAccountCreation(){
@@ -46,7 +50,9 @@ class AccountCreation extends Component {
         },
         body: JSON.stringify({
           username: this.state.username,
-          password: this.state.password,
+          first_name: this.state.firstName,
+          last_name: this.state.lastName,
+          password: this.state.password
         })
     })
       .then((response) => {
@@ -60,11 +66,7 @@ class AccountCreation extends Component {
         }
 
         $("#create-account-popup").trigger("click");
-        this.setState({
-          username: "",
-          password: "",
-          password2: ""
-        })
+        this.setState({ username: "", password: "", password2: "" });
 
         this.props.handleCreation();
 
@@ -85,25 +87,30 @@ class AccountCreation extends Component {
             </div>
 
             <div class="modal-body">
-              <form>
+              <form onSubmit={this.handleAccountCreation}>
                 <div class="form-group">
                   <label for="username-field" class="col-form-label">Username</label>
-                  <input class="form-control" type="text" id="username-field" onChange={this.handleUserChange} />
+                  <input class="form-control" value={this.state.username} type="text" id="username-field" onChange={this.handleUserChange} required />
+                </div>
+                <div class="form-group">
+                  <label for="firstname-field" class="col-form-label">First Name</label>
+                  <input class="form-control" value={this.state.firstName} type="text" id="firstname-field" onChange={this.handleFirstNameChange} required />
+                </div>
+                <div class="form-group">
+                  <label for="lastname-field" class="col-form-label">Last Name</label>
+                  <input class="form-control" value={this.state.lastName} type="text" id="lastname-field" onChange={this.handleLastNameChange} required />
                 </div>
                 <div class="form-group">
                   <label for="password-field" class="col-form-label">Password</label>
-                  <input class="form-control" type="password" id="password-field" onChange={this.handlePasswordChange} />
+                  <input class="form-control" value={this.state.password} type="password" id="password-field" onChange={this.handlePasswordChange} required />
                 </div>
                 <div class="form-group">
                   <label for="reenter-password-field" class="col-form-label">Re-enter Password</label>
-                  <input class="form-control" type="password" id="reenter-password-field" onChange={this.handlePassword2Change} />
+                  <input class="form-control" value={this.state.password2} type="password" id="reenter-password-field" onChange={this.handlePassword2Change} required/>
                 </div>
+                <button class="btn btn-primary" type="submit">Create Account</button>
               </form>
               <div style={{color: "red"}}> {this.state.errorMsg} </div>
-            </div>
-
-            <div class="modal-footer">
-              <button class="btn btn-primary" onClick={this.handleAccountCreation}>Create Account</button>
             </div>
           </div>
         </div>
