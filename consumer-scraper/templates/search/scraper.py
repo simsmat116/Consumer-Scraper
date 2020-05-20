@@ -121,7 +121,7 @@ class NeimanScraper(ConsumerScraper):
                 price = float(price.getText().replace("$", "").replace(",", ""))
                 # Define dctionary used to find the image link
                 image_class = {"class": "slick-slide slick-active slick-current"}
-                image_link = "https://" + soup.find("div", attrs=image_class).find("img")["src"]
+                image_link = "https:" + soup.find("div", attrs=image_class).find("img")["src"]
                 # Define dictionary used to find the description
                 description_class = {"class": "product-description__content__cutline-standard"}
                 # Description is a unordered list of items
