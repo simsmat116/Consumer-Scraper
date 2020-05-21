@@ -21,7 +21,7 @@ class Home extends Component {
   }
 
   handleSearch(e){
-    this.props.history.push('/search');
+    this.props.history.push('/search?q=' + this.state.search + '&page=1');
   }
 
   render(){

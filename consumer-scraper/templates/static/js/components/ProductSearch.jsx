@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Product from './Product';
 import PageNav from './PageNav';
 import NavBar from './NavBar';
+import * as qs from 'query-string';
 
 class ProductSearch extends Component {
 
@@ -16,6 +17,16 @@ class ProductSearch extends Component {
     this.validPage = this.validPage.bind(this);
     this.postSearchQuery = this.postSearchQuery.bind(this);
     this.fetchPageResults = this.fetchPageResults.bind(this);
+    this.submitSearch = this.submitSearch.bind(this);
+
+    let params = qs.parse(this.props.location.search);
+    let search = "q" in params
+    this.state = { products: [], search: "q" in params ? params["q"] : "", page: 1, numPages: 0, productExists: false };
+
+    if(search){
+      this.handleSearch();
+    }
+
   }
 
   postSearchQuery(){
@@ -69,8 +80,7 @@ class ProductSearch extends Component {
     });
   }
 
-  handleSearch(e){
-    e.preventDefault();
+  handleSearch(){
     this.postSearchQuery();
     // Wait 5 seconds before checking the database
     setTimeout(function(){
@@ -82,6 +92,11 @@ class ProductSearch extends Component {
         setTimeout(function(){ this.fetchPageResults(1); }.bind(this), 6000);
       }
     }.bind(this), 2000);
+  }
+
+  submitSearch(e){
+    e.preventDefault();
+    this.handleSearch();
   }
 
   validPage(page){
@@ -131,7 +146,7 @@ class ProductSearch extends Component {
         <div>
           <form class="search-container">
             <input class="search" type="text" placeholder="What are you shopping for?" onChange={this.handleSearchChange}/>
-            <input type="submit" class="searchSubmit" onClick={this.handleSearch} />
+            <input type="submit" class="searchSubmit" onClick={this.submitSearch} />
           </form>
             {this.state.products.map(product => (
               <Product
