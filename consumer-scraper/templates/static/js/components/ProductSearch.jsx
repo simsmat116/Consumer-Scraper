@@ -9,7 +9,7 @@ class ProductSearch extends Component {
   constructor(props) {
     // Initialize mutable state
     super(props);
-    this.state = { products: [], search: "", page: 1, numPages: 0 };
+    this.state = { products: [], search: "", page: 1, numPages: 0, productExists: false };
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.pageClick = this.pageClick.bind(this);
@@ -30,12 +30,17 @@ class ProductSearch extends Component {
           search: this.state.search
         })
       })
-        .then((context) => {
+        .then((response) => {
           // If the POST is unsuccessful, throw an error
           if (!response.ok) throw Error(response.statusText);
-          return response.json();
+          return response.text();
         })
-        .catch(error => console.log(error))
+        .then((text) => {
+          if(text === "Product Exists"){
+            this.setState( { productExists: true })
+          }
+        })
+        .catch(error => console.log(error));
   }
 
   fetchPageResults(pageNum){
@@ -66,7 +71,15 @@ class ProductSearch extends Component {
     e.preventDefault();
     this.postSearchQuery();
     // Wait 5 seconds before checking the database
-    setTimeout(function(){this.fetchPageResults(1)}.bind(this), 5000);
+    setTimeout(function(){
+      if(this.state.productExists){
+        this.fetchPageResults(1);
+        this.setState({ productExists: false });
+      }
+      else{
+        setTimeout(function(){ this.fetchPageResults(1); }.bind(this), 6000);
+      }
+    }.bind(this), 2000);
   }
 
   validPage(page){

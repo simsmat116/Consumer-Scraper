@@ -74,7 +74,6 @@ class AccountCreation extends Component {
   }
 
 
-
   render(){
     return(
       <div class="modal fade" id="create-account-popup">

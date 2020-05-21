@@ -33,7 +33,6 @@ async def scrape_results():
     cursor.execute("SELECT * FROM scraped_products WHERE search = %s", (search,))
     # Return if this search already exists in the database
     if cursor.fetchone():
-        print("yes")
         return await make_response('Product Exists', '200')
 
 
@@ -53,7 +52,6 @@ def retrieve_results():
     username = request.cookies.get('username')
     search = request.args.get('q')
     page = request.args.get('p')
-    print(page)
     offset = (int(page) - 1) * 10
     conn = get_db()
     cursor = conn.cursor()
@@ -68,7 +66,7 @@ def retrieve_results():
     context = { "results": [] }
     for result in results:
         context["results"].append(result)
-        
+
     cursor.execute("SELECT COUNT(*) FROM scraped_products WHERE search = %s", (search,))
     num_records = cursor.fetchone()[0]
 
