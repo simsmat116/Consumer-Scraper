@@ -57,6 +57,8 @@ class ProductSearch extends Component {
             products: context.results,
             numPages: context.num_pages
           });
+
+          this.props.history.push('/search' + '?q=' + this.state.search);
       })
       .catch(error => console.log(error));
   }
@@ -121,7 +123,6 @@ class ProductSearch extends Component {
         currPage={this.state.page}
       />
     }
-
 
     // Render each posts
     return (
